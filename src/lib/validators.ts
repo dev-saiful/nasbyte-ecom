@@ -28,6 +28,18 @@ export const otpSchema = z.object({
     .regex(/^\d+$/, "Must be 6 digits"),
 });
 
+export const emailSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
+export const verifyEmailSchema = z.object({
+  code: z
+    .string()
+    .length(6, "OTP must be 6 digits")
+    .regex(/^\d+$/, "Must be 6 digits"),
+  email: z.string().email("Invalid email address"),
+});
+
 export const checkoutSchema = z.object({
   shippingAddress: z.string().min(1, "Address is required"),
   shippingCity: z.string().min(1, "City is required"),
@@ -94,6 +106,8 @@ export const categorySchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type OtpInput = z.infer<typeof otpSchema>;
+export type EmailInput = z.infer<typeof emailSchema>;
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
 export type AddressInput = z.infer<typeof addressSchema>;
 export type ProfileInput = z.infer<typeof profileSchema>;

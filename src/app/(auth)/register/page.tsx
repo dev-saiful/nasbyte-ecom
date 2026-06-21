@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,9 +19,9 @@ import { Label } from "@/components/ui/label";
 import { type RegisterInput, registerSchema } from "@/lib/validators";
 
 export default function RegisterPage() {
-  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   const {
     register,
@@ -31,7 +32,6 @@ export default function RegisterPage() {
   });
 
   async function onSubmit(data: RegisterInput) {
-    setError(null);
     setIsLoading(true);
 
     try {
@@ -44,13 +44,14 @@ export default function RegisterPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error || "Registration failed");
+        toast.error(result.error || "Registration failed");
         return;
       }
 
+      setRegisteredEmail(data.email);
       setIsSuccess(true);
     } catch {
-      setError("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -72,7 +73,10 @@ export default function RegisterPage() {
           </p>
         </CardContent>
         <CardFooter>
-          <Link href="/auth/verify-email" className="w-full">
+          <Link
+            href={`/verify-email?email=${encodeURIComponent(registeredEmail ?? "")}`}
+            className="w-full"
+          >
             <Button className="w-full">Enter Verification Code</Button>
           </Link>
         </CardFooter>
@@ -88,11 +92,6 @@ export default function RegisterPage() {
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
-          {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              {error}
-            </div>
-          )}
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -164,7 +163,7 @@ export default function RegisterPage() {
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/auth/login" className="text-primary hover:underline">
+            <Link href="/login" className="text-primary hover:underline">
               Sign in
             </Link>
           </p>

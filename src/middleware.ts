@@ -11,7 +11,7 @@ export default auth((req) => {
   const session = req.auth;
 
   // Guest-only routes (redirect to /account if logged in)
-  const guestOnlyRoutes = ["/auth/login", "/auth/register"];
+  const guestOnlyRoutes = ["/login", "/register"];
   if (guestOnlyRoutes.some((route) => pathname.startsWith(route))) {
     if (session) {
       return NextResponse.redirect(new URL("/account", req.url));
@@ -22,7 +22,7 @@ export default auth((req) => {
   const authRequiredRoutes = ["/account", "/checkout"];
   if (authRequiredRoutes.some((route) => pathname.startsWith(route))) {
     if (!session) {
-      const loginUrl = new URL("/auth/login", req.url);
+      const loginUrl = new URL("/login", req.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }
@@ -32,7 +32,7 @@ export default auth((req) => {
   const verifiedRequiredRoutes = ["/checkout"];
   if (verifiedRequiredRoutes.some((route) => pathname.startsWith(route))) {
     if (session && !(session.user as any).isVerified) {
-      return NextResponse.redirect(new URL("/auth/verify-email", req.url));
+      return NextResponse.redirect(new URL("/verify-email", req.url));
     }
   }
 
@@ -40,7 +40,7 @@ export default auth((req) => {
   const adminRoutes = ["/admin"];
   if (adminRoutes.some((route) => pathname.startsWith(route))) {
     if (!session) {
-      const loginUrl = new URL("/auth/login", req.url);
+      const loginUrl = new URL("/login", req.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }
@@ -57,7 +57,7 @@ export const config = {
     "/account/:path*",
     "/admin/:path*",
     "/checkout/:path*",
-    "/auth/login",
-    "/auth/register",
+    "/login",
+    "/register",
   ],
 };

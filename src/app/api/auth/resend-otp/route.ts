@@ -2,15 +2,24 @@ import { NextResponse } from "next/server";
 import { sendOtpEmail } from "@/lib/email";
 import { generateOtp, hashOtp, isOtpRateLimited, OTP_TTL_MS } from "@/lib/otp";
 import { prisma } from "@/lib/prisma";
+import { emailSchema } from "@/lib/validators";
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
-    const user = await prisma.user.findFirst({
-      where: {
-        emailVerificationOtpHash: { not: null },
-        deletedAt: null,
-      },
-      orderBy: { createdAt: "desc" },
+    const body = await req.json();
+    const parsed = emailSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.errors[0].message },
+        { status: 400 },
+      );
+    }
+
+    const { email } = parsed.data;
+
+    const user = await prisma.user.findUnique({
+      where: { email, deletedAt: null },
     });
 
     if (!user) {

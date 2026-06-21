@@ -1,9 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,8 +20,8 @@ import { type OtpInput, otpSchema } from "@/lib/validators";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email") || "";
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
 
@@ -33,53 +34,51 @@ export default function VerifyEmailPage() {
   });
 
   async function onSubmit(data: OtpInput) {
-    setError(null);
-    setSuccess(null);
     setIsLoading(true);
 
     try {
       const response = await fetch("/api/auth/verify-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: data.code }),
+        body: JSON.stringify({ code: data.code, email }),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error || "Verification failed");
+        toast.error(result.error || "Verification failed");
         return;
       }
 
-      setSuccess("Email verified successfully! Redirecting...");
+      toast.success("Email verified successfully! Redirecting...");
       setTimeout(() => router.push("/account"), 2000);
     } catch {
-      setError("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   }
 
   async function handleResend() {
-    setError(null);
-    setSuccess(null);
     setIsResending(true);
 
     try {
       const response = await fetch("/api/auth/resend-otp", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error || "Failed to resend code");
+        toast.error(result.error || "Failed to resend code");
         return;
       }
 
-      setSuccess("New verification code sent to your email.");
+      toast.success("New verification code sent to your email.");
     } catch {
-      setError("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsResending(false);
     }
@@ -95,16 +94,6 @@ export default function VerifyEmailPage() {
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
-          {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="rounded-md bg-success/10 p-3 text-sm text-success">
-              {success}
-            </div>
-          )}
           <div className="space-y-2">
             <Label htmlFor="code">Verification Code</Label>
             <Input

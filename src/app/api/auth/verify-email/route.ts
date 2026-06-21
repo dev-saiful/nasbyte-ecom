@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { isMaxAttemptsReached, isOtpExpired, verifyOtp } from "@/lib/otp";
 import { prisma } from "@/lib/prisma";
-import { otpSchema } from "@/lib/validators";
+import { verifyEmailSchema } from "@/lib/validators";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const parsed = otpSchema.safeParse(body);
+    const parsed = verifyEmailSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
@@ -15,14 +15,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const { code } = parsed.data;
+    const { code, email } = parsed.data;
 
-    const user = await prisma.user.findFirst({
-      where: {
-        emailVerificationOtpHash: { not: null },
-        deletedAt: null,
-      },
-      orderBy: { createdAt: "desc" },
+    const user = await prisma.user.findUnique({
+      where: { email, deletedAt: null },
     });
 
     if (
