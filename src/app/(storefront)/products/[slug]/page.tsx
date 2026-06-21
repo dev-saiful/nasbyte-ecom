@@ -99,7 +99,10 @@ export default async function ProductDetailPage({
 
           {product.hasVariants && (
             <ProductVariants
-              variants={product.variants}
+              variants={product.variants.map((v) => ({
+                ...v,
+                price: Number(v.price),
+              }))}
               selectedVariantId={null}
               onSelectVariant={() => {}}
             />
