@@ -4,16 +4,16 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-const categories = [
-  { name: "All", slug: "" },
-  { name: "Scarves", slug: "scarves" },
-  { name: "Bags", slug: "bags" },
-  { name: "Jewelry", slug: "jewelry" },
-  { name: "Shoes", slug: "shoes" },
-  { name: "Accessories", slug: "accessories" },
-];
+interface Category {
+  name: string;
+  slug: string;
+}
 
-export function ProductFilters() {
+interface ProductFiltersProps {
+  categories: Category[];
+}
+
+export function ProductFilters({ categories }: ProductFiltersProps) {
   const searchParams = useSearchParams();
   const currentCategory = searchParams.get("category") || "";
 
@@ -22,9 +22,13 @@ export function ProductFilters() {
       <h3 className="text-sm font-semibold">Categories</h3>
       <nav className="flex flex-col gap-1">
         {categories.map((category) => {
-          const href = category.slug
-            ? `/products?category=${category.slug}`
-            : "/products";
+          const params = new URLSearchParams(searchParams.toString());
+          if (category.slug) {
+            params.set("category", category.slug);
+          } else {
+            params.delete("category");
+          }
+          const href = `/products?${params.toString()}`;
           return (
             <Link
               key={category.slug}

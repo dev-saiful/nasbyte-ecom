@@ -1,19 +1,8 @@
 "use client";
 
-import { ProductCard } from "./product-card";
+import { ProductCard, type ProductCardProps } from "./product-card";
 
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  price: number;
-  compareAtPrice: number | null;
-  averageRating: number;
-  reviewCount: number;
-  isFeatured: boolean;
-  category?: { name: string; slug: string } | null;
-  productImages?: { path: string; sortOrder: number }[];
-}
+type Product = ProductCardProps["product"];
 
 interface ProductListProps {
   products: Product[];

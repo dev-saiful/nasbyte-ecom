@@ -3,7 +3,8 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface ProductPaginationProps {
   currentPage: number;
@@ -41,16 +42,17 @@ export function ProductPagination({
 
   return (
     <nav className="flex items-center justify-center gap-1">
-      <Button
-        variant="outline"
-        size="icon"
-        asChild
-        disabled={currentPage === 1}
+      <Link
+        href={createPageURL(currentPage - 1)}
+        aria-disabled={currentPage === 1}
+        tabIndex={currentPage === 1 ? -1 : 0}
+        className={cn(
+          buttonVariants({ variant: "outline", size: "icon" }),
+          currentPage === 1 && "pointer-events-none opacity-50",
+        )}
       >
-        <Link href={createPageURL(currentPage - 1)}>
-          <ChevronLeft className="size-4" />
-        </Link>
-      </Button>
+        <ChevronLeft className="size-4" />
+      </Link>
 
       {(() => {
         let ellipsisCount = 0;
@@ -64,28 +66,31 @@ export function ProductPagination({
             );
           }
           return (
-            <Button
+            <Link
               key={page}
-              variant={page === currentPage ? "default" : "outline"}
-              size="icon"
-              asChild
+              href={createPageURL(page)}
+              className={buttonVariants({
+                variant: page === currentPage ? "default" : "outline",
+                size: "icon",
+              })}
             >
-              <Link href={createPageURL(page)}>{page}</Link>
-            </Button>
+              {page}
+            </Link>
           );
         });
       })()}
 
-      <Button
-        variant="outline"
-        size="icon"
-        asChild
-        disabled={currentPage === totalPages}
+      <Link
+        href={createPageURL(currentPage + 1)}
+        aria-disabled={currentPage === totalPages}
+        tabIndex={currentPage === totalPages ? -1 : 0}
+        className={cn(
+          buttonVariants({ variant: "outline", size: "icon" }),
+          currentPage === totalPages && "pointer-events-none opacity-50",
+        )}
       >
-        <Link href={createPageURL(currentPage + 1)}>
-          <ChevronRight className="size-4" />
-        </Link>
-      </Button>
+        <ChevronRight className="size-4" />
+      </Link>
     </nav>
   );
 }
