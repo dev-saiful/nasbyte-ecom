@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 import { auth } from "@/lib/auth";
 import { SHIPPING_COST } from "@/lib/price";
@@ -17,7 +18,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const data = checkoutSchema.parse(body);
+    const parsed = checkoutSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: parsed.error.flatten() },
+        { status: 400 },
+      );
+    }
+    const data = parsed.data;
 
     const cartItems = await prisma.cartItem.findMany({
       where: { userId: session.user.id },
@@ -42,8 +50,41 @@ export async function POST(request: Request) {
     }
 
     const order = await prisma.$transaction(async (tx) => {
+      const productIds = [
+        ...new Set(
+          cartItems.filter((i) => !i.variantId).map((i) => i.productId),
+        ),
+      ];
+      const variantIds = [
+        ...new Set(
+          cartItems
+            .filter((i) => i.variantId)
+            .map((i) => i.variantId as string),
+        ),
+      ];
+
+      const lockedProducts = await tx.$queryRaw<
+        { id: string; stock: number }[]
+      >`
+        SELECT id, stock FROM products WHERE id = ANY(${productIds}::uuid[]) FOR UPDATE
+      `;
+      const lockedVariants = await tx.$queryRaw<
+        { id: string; stock: number }[]
+      >`
+        SELECT id, stock FROM product_variants WHERE id = ANY(${variantIds}::uuid[]) FOR UPDATE
+      `;
+
+      const productStockMap = new Map(
+        lockedProducts.map((p) => [p.id, p.stock]),
+      );
+      const variantStockMap = new Map(
+        lockedVariants.map((v) => [v.id, v.stock]),
+      );
+
       for (const item of cartItems) {
-        const stock = item.variant?.stock ?? item.product.stock;
+        const stock = item.variantId
+          ? (variantStockMap.get(item.variantId) ?? 0)
+          : (productStockMap.get(item.productId) ?? 0);
         if (item.quantity > stock) {
           throw new Error(`Insufficient stock for ${item.product.name}`);
         }
@@ -103,6 +144,10 @@ export async function POST(request: Request) {
       });
 
       for (const item of cartItems) {
+        const oldStock = item.variantId
+          ? (variantStockMap.get(item.variantId) ?? 0)
+          : (productStockMap.get(item.productId) ?? 0);
+
         if (item.variantId) {
           await tx.productVariant.update({
             where: { id: item.variantId },
@@ -115,7 +160,6 @@ export async function POST(request: Request) {
           });
         }
 
-        const oldStock = item.variant?.stock ?? item.product.stock;
         await tx.inventoryStockLog.create({
           data: {
             productId: item.productId,
@@ -141,6 +185,12 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Checkout error:", error);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation failed", details: error.flatten() },
+        { status: 400 },
+      );
+    }
     return NextResponse.json(
       { error: "Failed to process checkout" },
       { status: 500 },
