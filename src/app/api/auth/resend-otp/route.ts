@@ -19,10 +19,10 @@ export async function POST(req: Request) {
     const { email } = parsed.data;
 
     const user = await prisma.user.findUnique({
-      where: { email, deletedAt: null },
+      where: { email },
     });
 
-    if (!user) {
+    if (!user || user.deletedAt !== null) {
       return NextResponse.json(
         { error: "No pending verification found" },
         { status: 400 },

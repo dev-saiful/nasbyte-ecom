@@ -18,11 +18,12 @@ export async function POST(request: Request) {
     const { code, email } = parsed.data;
 
     const user = await prisma.user.findUnique({
-      where: { email, deletedAt: null },
+      where: { email },
     });
 
     if (
       !user ||
+      user.deletedAt !== null ||
       !user.emailVerificationOtpHash ||
       !user.emailVerificationOtpSentAt
     ) {
