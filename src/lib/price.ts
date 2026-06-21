@@ -12,3 +12,11 @@ export function calculateSubtotal(
 export function calculateTotal(subtotal: number): number {
   return subtotal + SHIPPING_COST;
 }
+
+export function calculateCartTotal(
+  items: { price: { toString(): string }; quantity: number }[],
+): { subtotal: number; shipping: number; total: number } {
+  const subtotal = calculateSubtotal(items);
+  const total = calculateTotal(subtotal);
+  return { subtotal, shipping: SHIPPING_COST, total };
+}

@@ -114,3 +114,19 @@ export type ProfileInput = z.infer<typeof profileSchema>;
 export type PasswordChangeInput = z.infer<typeof passwordChangeSchema>;
 export type ProductInput = z.infer<typeof productSchema>;
 export type CategoryInput = z.infer<typeof categorySchema>;
+
+export const cartItemSchema = z.object({
+  productId: z.string().uuid(),
+  variantId: z.string().uuid().optional(),
+  quantity: z.number().int().min(1),
+});
+
+export const productFiltersSchema = z.object({
+  category: z.string().optional(),
+  search: z.string().optional(),
+  sort: z.enum(["newest", "price-asc", "price-desc", "popularity"]).optional(),
+  page: z.number().int().min(1).optional(),
+});
+
+export type CartItemInput = z.infer<typeof cartItemSchema>;
+export type ProductFiltersInput = z.infer<typeof productFiltersSchema>;
