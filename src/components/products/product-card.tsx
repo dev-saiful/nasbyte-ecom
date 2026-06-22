@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatBDT } from "@/lib/utils";
 
-interface ProductCardProps {
+export interface ProductCardProps {
   product: {
     id: string;
     name: string;

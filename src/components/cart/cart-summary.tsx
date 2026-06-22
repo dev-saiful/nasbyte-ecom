@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SHIPPING_COST } from "@/lib/price";
@@ -32,12 +31,18 @@ export function CartSummary({ subtotal, itemCount }: CartSummaryProps) {
           <span>Total</span>
           <span>{formatBDT(total)}</span>
         </div>
-        <Button asChild className="w-full" size="lg">
-          <Link href="/checkout">Proceed to Checkout</Link>
-        </Button>
-        <Button asChild variant="ghost" className="w-full">
-          <Link href="/products">Continue Shopping</Link>
-        </Button>
+        <Link
+          href="/checkout"
+          className="inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+        >
+          Proceed to Checkout
+        </Link>
+        <Link
+          href="/products"
+          className="inline-flex h-8 w-full items-center justify-center gap-1 rounded-lg text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          Continue Shopping
+        </Link>
       </CardContent>
     </Card>
   );

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { OrderDetails } from "@/components/order/order-details";
 import { OrderTimeline } from "@/components/order/order-timeline";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 
@@ -67,12 +66,18 @@ export default async function OrderConfirmationPage({
           </Card>
 
           <div className="mt-6 flex flex-col gap-3">
-            <Button asChild>
-              <Link href="/products">Continue Shopping</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/track-order">Track Order</Link>
-            </Button>
+            <Link
+              href="/products"
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+            >
+              Continue Shopping
+            </Link>
+            <Link
+              href="/track-order"
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-2.5 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground"
+            >
+              Track Order
+            </Link>
           </div>
         </div>
       </div>

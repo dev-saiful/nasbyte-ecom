@@ -1,6 +1,5 @@
 import { ShoppingBag } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export function CartEmpty() {
   return (
@@ -10,9 +9,12 @@ export function CartEmpty() {
       <p className="mt-2 text-muted-foreground">
         Add some items to your cart to get started
       </p>
-      <Button asChild className="mt-6">
-        <Link href="/products">Start Shopping</Link>
-      </Button>
+      <Link
+        href="/products"
+        className="mt-6 inline-flex h-8 items-center justify-center gap-1 rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+      >
+        Start Shopping
+      </Link>
     </div>
   );
 }

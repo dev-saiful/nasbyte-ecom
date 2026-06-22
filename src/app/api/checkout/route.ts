@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -30,7 +31,15 @@ export async function POST(request: Request) {
     const cartItems = await prisma.cartItem.findMany({
       where: { userId: session.user.id },
       include: {
-        product: true,
+        product: {
+          include: {
+            productImages: {
+              select: { path: true },
+              orderBy: { sortOrder: "asc" as const },
+              take: 1,
+            },
+          },
+        },
         variant: {
           include: {
             variantOptions: {
@@ -132,12 +141,14 @@ export async function POST(request: Request) {
                       vo.optionValue.value,
                     ]),
                   )
-                : null,
+                : Prisma.JsonNull,
               price: item.variant?.price ?? item.price,
               quantity: item.quantity,
               total: Number(item.variant?.price ?? item.price) * item.quantity,
-              productId: item.productId,
-              variantId: item.variantId,
+              product: { connect: { id: item.productId } },
+              variant: item.variantId
+                ? { connect: { id: item.variantId } }
+                : undefined,
             })),
           },
         },

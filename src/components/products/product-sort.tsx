@@ -21,7 +21,8 @@ export function ProductSort() {
   const searchParams = useSearchParams();
   const currentSort = searchParams.get("sort") || "newest";
 
-  const handleSort = (value: string) => {
+  const handleSort = (value: string | null) => {
+    if (!value) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set("sort", value);
     router.push(`/products?${params.toString()}`);
