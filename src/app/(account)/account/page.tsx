@@ -49,12 +49,16 @@ export default async function AccountPage() {
     }),
   ]);
 
+  const recentOrderSerialized = recentOrder
+    ? { ...recentOrder, total: Number(recentOrder.total) }
+    : null;
+
   return (
     <AccountOverview
       totalOrders={totalOrders}
       pendingOrders={pendingOrders}
       savedAddresses={savedAddresses}
-      recentOrder={recentOrder}
+      recentOrder={recentOrderSerialized}
       defaultAddress={defaultAddress}
     />
   );

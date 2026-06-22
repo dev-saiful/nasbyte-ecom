@@ -55,8 +55,8 @@ export const addressSchema = z.object({
   addressLine: z.string().min(1, "Address is required"),
   city: z.string().min(1, "City is required").max(100),
   postalCode: z.string().max(20).optional(),
-  country: z.string().default("Bangladesh"),
-  isDefault: z.boolean().default(false),
+  country: z.string().optional(),
+  isDefault: z.boolean().optional(),
 });
 
 export const profileSchema = z.object({
