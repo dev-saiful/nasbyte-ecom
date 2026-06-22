@@ -1,10 +1,17 @@
 "use client";
 
-import { Menu, Search, ShoppingBag } from "lucide-react";
+import { LogOut, Menu, Search, ShoppingBag, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -19,7 +26,14 @@ const navLinks = [
   { href: "/track-order", label: "Track Order" },
 ];
 
-export function StorefrontHeader() {
+interface StorefrontHeaderProps {
+  user?: {
+    name?: string | null;
+    email?: string | null;
+  } | null;
+}
+
+export function StorefrontHeader({ user }: StorefrontHeaderProps) {
   const [open, setOpen] = useState(false);
   const { totalItems } = useCart();
 
@@ -71,20 +85,54 @@ export function StorefrontHeader() {
             </Button>
           </Link>
 
-          <div className="hidden items-center gap-2 md:flex">
-            <Link
-              href="/login"
-              className="inline-flex h-7 items-center justify-center gap-1 rounded-md bg-transparent px-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/register"
-              className="inline-flex h-7 items-center justify-center gap-1 rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
-            >
-              Sign up
-            </Link>
-          </div>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button variant="ghost" size="icon">
+                    <User className="size-4" />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="end">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  render={<Link href="/account">My Account</Link>}
+                />
+                <DropdownMenuItem
+                  render={<Link href="/account/orders">My Orders</Link>}
+                />
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    window.location.href = "/api/auth/signout";
+                  }}
+                >
+                  <LogOut className="mr-2 size-4" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="hidden items-center gap-2 md:flex">
+              <Link
+                href="/login"
+                className="inline-flex h-7 items-center justify-center gap-1 rounded-md bg-transparent px-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/register"
+                className="inline-flex h-7 items-center justify-center gap-1 rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+              >
+                Sign up
+              </Link>
+            </div>
+          )}
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
@@ -111,20 +159,51 @@ export function StorefrontHeader() {
                   </Link>
                 ))}
                 <div className="my-2 border-t" />
-                <Link
-                  href="/login"
-                  onClick={() => setOpen(false)}
-                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Log in
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setOpen(false)}
-                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Sign up
-                </Link>
+                {user ? (
+                  <>
+                    <Link
+                      href="/account"
+                      onClick={() => setOpen(false)}
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      My Account
+                    </Link>
+                    <Link
+                      href="/account/orders"
+                      onClick={() => setOpen(false)}
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      My Orders
+                    </Link>
+                    <div className="my-2 border-t" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.location.href = "/api/auth/signout";
+                      }}
+                      className="text-left text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setOpen(false)}
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      Log in
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setOpen(false)}
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      Sign up
+                    </Link>
+                  </>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
