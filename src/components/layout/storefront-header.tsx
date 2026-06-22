@@ -11,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useCart } from "@/hooks/use-cart";
 
 const navLinks = [
   { href: "/products", label: "Shop All" },
@@ -20,6 +21,7 @@ const navLinks = [
 
 export function StorefrontHeader() {
   const [open, setOpen] = useState(false);
+  const { totalItems } = useCart();
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -58,12 +60,14 @@ export function StorefrontHeader() {
               className="relative"
             >
               <ShoppingBag className="size-4" />
-              <Badge
-                variant="secondary"
-                className="absolute -right-1 -top-1 size-4 justify-center rounded-full p-0 text-[10px]"
-              >
-                0
-              </Badge>
+              {totalItems > 0 && (
+                <Badge
+                  variant="secondary"
+                  className="absolute -right-1 -top-1 size-4 justify-center rounded-full p-0 text-[10px]"
+                >
+                  {totalItems > 99 ? "99+" : totalItems}
+                </Badge>
+              )}
             </Button>
           </Link>
 
