@@ -80,7 +80,9 @@ export default async function OrdersPage() {
                     <p>{order.items.length} item(s)</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">{formatBDT(Number(order.total))}</p>
+                    <p className="font-medium">
+                      {formatBDT(Number(order.total))}
+                    </p>
                     <Link
                       href={`/account/orders/${order.id}`}
                       className="text-sm text-primary hover:underline"
