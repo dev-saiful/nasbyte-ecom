@@ -16,7 +16,7 @@ import { useCart } from "@/hooks/use-cart";
 const navLinks = [
   { href: "/products", label: "Shop All" },
   { href: "/products?featured=true", label: "Featured" },
-  { href: "/policy", label: "Policy" },
+  { href: "/track-order", label: "Track Order" },
 ];
 
 export function StorefrontHeader() {
