@@ -1,0 +1,51 @@
+import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
+import { AdminKpiCard } from "@/components/admin/admin-kpi-card";
+import { formatBDT } from "@/lib/utils";
+
+async function getDashboardStats() {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/admin/dashboard`, {
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    throw new Error("Failed to fetch dashboard stats");
+  }
+  return res.json();
+}
+
+export default async function AdminDashboardPage() {
+  const stats = await getDashboardStats();
+
+  return (
+    <div className="space-y-6">
+      <h1 className="font-heading text-2xl font-bold">Dashboard</h1>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <AdminKpiCard
+          title="Total Revenue"
+          value={formatBDT(stats.revenue)}
+          icon={DollarSign}
+          description="From completed orders"
+        />
+        <AdminKpiCard
+          title="Total Orders"
+          value={stats.totalOrders.toLocaleString()}
+          icon={ShoppingCart}
+          description="Non-cancelled orders"
+        />
+        <AdminKpiCard
+          title="Total Products"
+          value={stats.totalProducts.toLocaleString()}
+          icon={Package}
+          description="Active products"
+        />
+        <AdminKpiCard
+          title="Total Users"
+          value={stats.totalUsers.toLocaleString()}
+          icon={Users}
+          description="Registered users"
+        />
+      </div>
+    </div>
+  );
+}
