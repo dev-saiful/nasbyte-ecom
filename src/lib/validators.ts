@@ -144,8 +144,8 @@ export const productVariantSchema = z.object({
   price: z.number().positive(),
   compareAtPrice: z.number().positive().optional(),
   stock: z.number().int().min(0),
-  isActive: z.boolean().default(true),
-  optionValues: z.record(z.string()).optional(),
+  isActive: z.boolean().optional(),
+  optionValues: z.record(z.string(), z.string()).optional(),
 });
 
 export const adminProductSchema = z.object({
@@ -156,9 +156,9 @@ export const adminProductSchema = z.object({
   sku: z.string().max(100).optional(),
   stock: z.number().int().min(0),
   categoryId: z.string().uuid().optional().nullable(),
-  hasVariants: z.boolean().default(false),
-  isFeatured: z.boolean().default(false),
-  isActive: z.boolean().default(true),
+  hasVariants: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
+  isActive: z.boolean().optional(),
   features: z.array(z.string()).optional(),
   options: z.array(productOptionSchema).optional(),
   variants: z.array(productVariantSchema).optional(),

@@ -77,11 +77,9 @@ export default function AdminProductsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold">Products</h1>
-        <Button asChild>
-          <Link href="/admin/products/new">
-            <Plus className="mr-2 size-4" />
-            Add Product
-          </Link>
+        <Button render={<Link href="/admin/products/new" />}>
+          <Plus className="mr-2 size-4" />
+          Add Product
         </Button>
       </div>
 
