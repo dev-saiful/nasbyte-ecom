@@ -35,7 +35,7 @@ const sidebarLinks = [
     href: "/admin/inventory",
     label: "Inventory",
     icon: Truck,
-    enabled: false,
+    enabled: true,
   },
   { href: "/admin/promos", label: "Promos", icon: Tags, enabled: false },
 ];
