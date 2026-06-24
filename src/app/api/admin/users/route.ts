@@ -1,6 +1,8 @@
+import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { adminUserCreateSchema } from "@/lib/validators";
 
 export async function GET(request: Request) {
   try {
@@ -65,6 +67,65 @@ export async function GET(request: Request) {
     console.error("Admin users GET error:", error);
     return NextResponse.json(
       { error: "Failed to fetch users" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const session = await auth();
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const parsed = adminUserCreateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: parsed.error.flatten() },
+        { status: 400 },
+      );
+    }
+
+    const data = parsed.data;
+
+    const existing = await prisma.user.findUnique({
+      where: { email: data.email },
+    });
+    if (existing) {
+      return NextResponse.json(
+        { error: "Email already in use" },
+        { status: 409 },
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        password: hashedPassword,
+        role: data.role || "USER",
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        isVerified: true,
+        createdAt: true,
+      },
+    });
+
+    return NextResponse.json({ user }, { status: 201 });
+  } catch (error) {
+    console.error("Admin users POST error:", error);
+    return NextResponse.json(
+      { error: "Failed to create user" },
       { status: 500 },
     );
   }
