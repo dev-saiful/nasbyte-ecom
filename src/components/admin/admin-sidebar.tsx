@@ -30,7 +30,7 @@ const sidebarLinks = [
     enabled: true,
   },
   { href: "/admin/users", label: "Users", icon: Users, enabled: true },
-  { href: "/admin/reviews", label: "Reviews", icon: Flag, enabled: false },
+  { href: "/admin/reviews", label: "Reviews", icon: Flag, enabled: true },
   {
     href: "/admin/inventory",
     label: "Inventory",
