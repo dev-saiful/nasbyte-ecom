@@ -180,3 +180,28 @@ export const paymentStatusUpdateSchema = z.object({
 
 export type OrderStatusUpdateInput = z.infer<typeof orderStatusUpdateSchema>;
 export type PaymentStatusUpdateInput = z.infer<typeof paymentStatusUpdateSchema>;
+
+// ─── ADMIN USER MANAGEMENT ────────────────────────────────────
+
+export const adminUserCreateSchema = z.object({
+  name: z.string().min(1).max(255),
+  email: z.string().email(),
+  phone: z.string().max(20).optional(),
+  password: z.string().min(8),
+  role: z.enum(["USER", "ADMIN"]).optional(),
+});
+
+export const adminUserUpdateSchema = z.object({
+  name: z.string().min(1).max(255).optional(),
+  email: z.string().email().optional(),
+  phone: z.string().max(20).optional(),
+  password: z.string().min(8).optional(),
+});
+
+export const adminUserRoleSchema = z.object({
+  role: z.enum(["USER", "ADMIN"]),
+});
+
+export type AdminUserCreateInput = z.infer<typeof adminUserCreateSchema>;
+export type AdminUserUpdateInput = z.infer<typeof adminUserUpdateSchema>;
+export type AdminUserRoleInput = z.infer<typeof adminUserRoleSchema>;

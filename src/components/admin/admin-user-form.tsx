@@ -140,7 +140,7 @@ export function AdminUserForm({ initialData }: AdminUserFormProps) {
       {!isEdit && (
         <div className="space-y-2">
           <label className="text-sm font-medium">Role</label>
-          <Select value={role} onValueChange={setRole}>
+          <Select value={role} onValueChange={(v) => { if (v) setRole(v); }}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>

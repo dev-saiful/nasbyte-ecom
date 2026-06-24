@@ -152,7 +152,7 @@ export function AdminUserTable() {
           <Select
             value={roleFilter}
             onValueChange={(v) => {
-              setRoleFilter(v === "all" ? "" : v);
+              setRoleFilter(v === "all" || v === null ? "" : v);
               setPage(1);
             }}
           >
@@ -168,7 +168,7 @@ export function AdminUserTable() {
           <Select
             value={verifiedFilter}
             onValueChange={(v) => {
-              setVerifiedFilter(v === "all" ? "" : v);
+              setVerifiedFilter(v === "all" || v === null ? "" : v);
               setPage(1);
             }}
           >
