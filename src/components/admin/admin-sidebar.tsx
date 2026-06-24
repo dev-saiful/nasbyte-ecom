@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 const sidebarLinks = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, enabled: true },
-  { href: "/admin/products", label: "Products", icon: Package, enabled: false },
+  { href: "/admin/products", label: "Products", icon: Package, enabled: true },
   {
     href: "/admin/categories",
     label: "Categories",
