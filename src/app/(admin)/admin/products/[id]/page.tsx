@@ -83,7 +83,11 @@ export default function AdminProductDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" render={<Link href="/admin/products" />}>
+          <Button
+            variant="ghost"
+            size="icon"
+            render={<Link href="/admin/products" />}
+          >
             <ArrowLeft className="size-4" />
           </Button>
           <h1 className="font-heading text-2xl font-bold">{product.name}</h1>

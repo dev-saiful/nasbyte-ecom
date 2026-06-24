@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { categorySchema } from "@/lib/validators";
 import type { z } from "zod";
 
-type CategoryFormData = z.infer<typeof categorySchema>;
+type CategoryFormData = z.input<typeof categorySchema>;
 
 interface AdminCategoryFormProps {
   initialData?: {
@@ -127,9 +127,7 @@ export function AdminCategoryForm({ initialData }: AdminCategoryFormProps) {
           placeholder="/images/categories/..."
         />
         {errors.imagePath && (
-          <p className="text-destructive text-sm">
-            {errors.imagePath.message}
-          </p>
+          <p className="text-destructive text-sm">{errors.imagePath.message}</p>
         )}
       </div>
 
@@ -141,11 +139,7 @@ export function AdminCategoryForm({ initialData }: AdminCategoryFormProps) {
               ? "Update Category"
               : "Create Category"}
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.back()}
-        >
+        <Button type="button" variant="outline" onClick={() => router.back()}>
           Cancel
         </Button>
       </div>
