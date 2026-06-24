@@ -27,7 +27,7 @@ const sidebarLinks = [
     href: "/admin/orders",
     label: "Orders",
     icon: ShoppingCart,
-    enabled: false,
+    enabled: true,
   },
   { href: "/admin/users", label: "Users", icon: Users, enabled: false },
   { href: "/admin/reviews", label: "Reviews", icon: Flag, enabled: false },
