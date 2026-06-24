@@ -114,7 +114,8 @@ export function AdminOrderDetail({ orderId }: AdminOrderDetailProps) {
     loadOrder();
   }, [orderId, router]);
 
-  async function handleStatusUpdate(newStatus: string) {
+  async function handleStatusUpdate(newStatus: string | null) {
+    if (!newStatus) return;
     setUpdatingStatus(true);
     try {
       const res = await fetch(`/api/admin/orders/${orderId}`, {
@@ -133,7 +134,8 @@ export function AdminOrderDetail({ orderId }: AdminOrderDetailProps) {
     }
   }
 
-  async function handlePaymentUpdate(newPaymentStatus: string) {
+  async function handlePaymentUpdate(newPaymentStatus: string | null) {
+    if (!newPaymentStatus) return;
     setUpdatingPayment(true);
     try {
       const res = await fetch(`/api/admin/orders/${orderId}/payment`, {

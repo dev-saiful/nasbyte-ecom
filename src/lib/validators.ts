@@ -167,3 +167,16 @@ export const adminProductSchema = z.object({
 export type ProductOptionInput = z.infer<typeof productOptionSchema>;
 export type ProductVariantInput = z.infer<typeof productVariantSchema>;
 export type AdminProductInput = z.infer<typeof adminProductSchema>;
+
+// ─── ADMIN ORDER STATUS ─────────────────────────────────────
+
+export const orderStatusUpdateSchema = z.object({
+  status: z.enum(["PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"]),
+});
+
+export const paymentStatusUpdateSchema = z.object({
+  paymentStatus: z.enum(["PENDING", "PAID", "FAILED", "REFUNDED"]),
+});
+
+export type OrderStatusUpdateInput = z.infer<typeof orderStatusUpdateSchema>;
+export type PaymentStatusUpdateInput = z.infer<typeof paymentStatusUpdateSchema>;
