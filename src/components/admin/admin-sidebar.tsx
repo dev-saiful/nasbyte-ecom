@@ -21,7 +21,7 @@ const sidebarLinks = [
     href: "/admin/categories",
     label: "Categories",
     icon: FolderTree,
-    enabled: false,
+    enabled: true,
   },
   {
     href: "/admin/orders",
