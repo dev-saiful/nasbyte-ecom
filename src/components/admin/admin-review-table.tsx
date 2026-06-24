@@ -235,7 +235,7 @@ export function AdminReviewTable() {
         <Select
           value={approvedFilter}
           onValueChange={(v) => {
-            setApprovedFilter(v === "all" ? "" : v);
+            setApprovedFilter(v === "all" || v === null ? "" : v);
             setPage(1);
           }}
         >
