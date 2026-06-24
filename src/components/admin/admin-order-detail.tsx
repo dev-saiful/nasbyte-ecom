@@ -7,12 +7,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -51,7 +46,12 @@ interface Order {
   paymentStatus: string;
   notes: string | null;
   createdAt: string;
-  user: { id: string; name: string; email: string; phone: string | null } | null;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string | null;
+  } | null;
   items: OrderItem[];
 }
 
@@ -125,7 +125,9 @@ export function AdminOrderDetail({ orderId }: AdminOrderDetailProps) {
       });
       if (!res.ok) throw new Error("Failed to update");
       const data = await res.json();
-      setOrder((prev) => (prev ? { ...prev, status: data.order.status } : null));
+      setOrder((prev) =>
+        prev ? { ...prev, status: data.order.status } : null,
+      );
       toast.success("Order status updated");
     } catch {
       toast.error("Failed to update order status");
@@ -176,7 +178,11 @@ export function AdminOrderDetail({ orderId }: AdminOrderDetailProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" render={<Link href="/admin/orders" />}>
+        <Button
+          variant="ghost"
+          size="icon"
+          render={<Link href="/admin/orders" />}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -204,7 +210,9 @@ export function AdminOrderDetail({ orderId }: AdminOrderDetailProps) {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-muted-foreground text-sm">Order Number</span>
+                <span className="text-muted-foreground text-sm">
+                  Order Number
+                </span>
                 <span className="font-mono text-sm">{order.orderNumber}</span>
               </div>
               <div className="flex justify-between">

@@ -40,7 +40,9 @@ export function AdminUserForm({ initialData }: AdminUserFormProps) {
     handleSubmit,
     formState: { errors },
   } = useForm<CreateFormData | UpdateFormData>({
-    resolver: zodResolver(isEdit ? adminUserUpdateSchema : adminUserCreateSchema),
+    resolver: zodResolver(
+      isEdit ? adminUserUpdateSchema : adminUserCreateSchema,
+    ),
     defaultValues: {
       name: initialData?.name || "",
       email: initialData?.email || "",
@@ -140,7 +142,12 @@ export function AdminUserForm({ initialData }: AdminUserFormProps) {
       {!isEdit && (
         <div className="space-y-2">
           <label className="text-sm font-medium">Role</label>
-          <Select value={role} onValueChange={(v) => { if (v) setRole(v); }}>
+          <Select
+            value={role}
+            onValueChange={(v) => {
+              if (v) setRole(v);
+            }}
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -154,11 +161,7 @@ export function AdminUserForm({ initialData }: AdminUserFormProps) {
 
       <div className="flex gap-3">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? "Saving..."
-            : isEdit
-              ? "Update User"
-              : "Create User"}
+          {isSubmitting ? "Saving..." : isEdit ? "Update User" : "Create User"}
         </Button>
         <Button type="button" variant="outline" onClick={() => router.back()}>
           Cancel

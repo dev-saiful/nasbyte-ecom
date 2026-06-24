@@ -234,9 +234,7 @@ export function AdminOrderTable() {
                   {order.orderNumber}
                 </TableCell>
                 <TableCell>
-                  <div className="text-sm">
-                    {order.user?.name ?? "Guest"}
-                  </div>
+                  <div className="text-sm">{order.user?.name ?? "Guest"}</div>
                   <div className="text-muted-foreground text-xs">
                     {order.user?.email ?? "—"}
                   </div>

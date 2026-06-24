@@ -171,7 +171,14 @@ export type AdminProductInput = z.infer<typeof adminProductSchema>;
 // ─── ADMIN ORDER STATUS ─────────────────────────────────────
 
 export const orderStatusUpdateSchema = z.object({
-  status: z.enum(["PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"]),
+  status: z.enum([
+    "PENDING",
+    "CONFIRMED",
+    "PROCESSING",
+    "SHIPPED",
+    "DELIVERED",
+    "CANCELLED",
+  ]),
 });
 
 export const paymentStatusUpdateSchema = z.object({
@@ -179,7 +186,9 @@ export const paymentStatusUpdateSchema = z.object({
 });
 
 export type OrderStatusUpdateInput = z.infer<typeof orderStatusUpdateSchema>;
-export type PaymentStatusUpdateInput = z.infer<typeof paymentStatusUpdateSchema>;
+export type PaymentStatusUpdateInput = z.infer<
+  typeof paymentStatusUpdateSchema
+>;
 
 // ─── ADMIN USER MANAGEMENT ────────────────────────────────────
 

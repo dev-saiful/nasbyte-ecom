@@ -1,18 +1,19 @@
 "use client";
 
-import { ArrowLeft, Pencil, ShieldCheck, ShieldOff, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Pencil,
+  ShieldCheck,
+  ShieldOff,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AdminDeleteDialog } from "./admin-delete-dialog";
@@ -88,9 +89,7 @@ export function AdminUserDetail({ userId }: AdminUserDetailProps) {
       setUser((prev) =>
         prev ? { ...prev, isVerified: data.user.isVerified } : null,
       );
-      toast.success(
-        data.user.isVerified ? "User verified" : "User unverified",
-      );
+      toast.success(data.user.isVerified ? "User verified" : "User unverified");
     } catch {
       toast.error("Failed to toggle verification");
     }
@@ -110,12 +109,12 @@ export function AdminUserDetail({ userId }: AdminUserDetailProps) {
         throw new Error(data.error || "Failed");
       }
       const data = await res.json();
-      setUser((prev) =>
-        prev ? { ...prev, role: data.user.role } : null,
-      );
+      setUser((prev) => (prev ? { ...prev, role: data.user.role } : null));
       toast.success(`Role changed to ${newRole}`);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update role");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update role",
+      );
     }
   }
 
@@ -155,7 +154,11 @@ export function AdminUserDetail({ userId }: AdminUserDetailProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" render={<Link href="/admin/users" />}>
+          <Button
+            variant="ghost"
+            size="icon"
+            render={<Link href="/admin/users" />}
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
@@ -191,7 +194,9 @@ export function AdminUserDetail({ userId }: AdminUserDetailProps) {
                 </div>
                 <div>
                   <p className="text-muted-foreground text-sm">Role</p>
-                  <Badge variant={user.role === "ADMIN" ? "default" : "secondary"}>
+                  <Badge
+                    variant={user.role === "ADMIN" ? "default" : "secondary"}
+                  >
                     {user.role}
                   </Badge>
                 </div>
@@ -230,9 +235,13 @@ export function AdminUserDetail({ userId }: AdminUserDetailProps) {
                       className="flex items-center justify-between rounded-md border p-3"
                     >
                       <div>
-                        <p className="text-sm font-medium">{order.orderNumber}</p>
+                        <p className="text-sm font-medium">
+                          {order.orderNumber}
+                        </p>
                         <p className="text-muted-foreground text-xs">
-                          {new Date(order.createdAt).toLocaleDateString("en-BD")}
+                          {new Date(order.createdAt).toLocaleDateString(
+                            "en-BD",
+                          )}
                         </p>
                       </div>
                       <div className="text-right">
@@ -277,9 +286,7 @@ export function AdminUserDetail({ userId }: AdminUserDetailProps) {
                 className="w-full justify-start"
                 onClick={handleToggleRole}
               >
-                {user.role === "ADMIN"
-                  ? "Demote to User"
-                  : "Promote to Admin"}
+                {user.role === "ADMIN" ? "Demote to User" : "Promote to Admin"}
               </Button>
               <Separator />
               <Button
@@ -296,9 +303,7 @@ export function AdminUserDetail({ userId }: AdminUserDetailProps) {
           {user.addresses.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>
-                  Addresses ({user._count.addresses})
-                </CardTitle>
+                <CardTitle>Addresses ({user._count.addresses})</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {user.addresses.map((addr) => (
