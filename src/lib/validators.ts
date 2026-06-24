@@ -130,3 +130,40 @@ export const productFiltersSchema = z.object({
 
 export type CartItemInput = z.infer<typeof cartItemSchema>;
 export type ProductFiltersInput = z.infer<typeof productFiltersSchema>;
+
+// ─── PRODUCT VARIANT ──────────────────────────────────────
+
+export const productOptionSchema = z.object({
+  name: z.string().min(1).max(100),
+  values: z.array(z.string().min(1).max(100)).min(1),
+});
+
+export const productVariantSchema = z.object({
+  name: z.string().max(255).optional(),
+  sku: z.string().max(100).optional(),
+  price: z.number().positive(),
+  compareAtPrice: z.number().positive().optional(),
+  stock: z.number().int().min(0),
+  isActive: z.boolean().default(true),
+  optionValues: z.record(z.string()).optional(),
+});
+
+export const adminProductSchema = z.object({
+  name: z.string().min(1).max(255),
+  description: z.string().optional(),
+  price: z.number().positive(),
+  compareAtPrice: z.number().positive().optional(),
+  sku: z.string().max(100).optional(),
+  stock: z.number().int().min(0),
+  categoryId: z.string().uuid().optional().nullable(),
+  hasVariants: z.boolean().default(false),
+  isFeatured: z.boolean().default(false),
+  isActive: z.boolean().default(true),
+  features: z.array(z.string()).optional(),
+  options: z.array(productOptionSchema).optional(),
+  variants: z.array(productVariantSchema).optional(),
+});
+
+export type ProductOptionInput = z.infer<typeof productOptionSchema>;
+export type ProductVariantInput = z.infer<typeof productVariantSchema>;
+export type AdminProductInput = z.infer<typeof adminProductSchema>;
