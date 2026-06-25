@@ -83,3 +83,26 @@ export async function sendOrderConfirmationEmail(
     `,
   });
 }
+
+export async function sendPasswordResetEmail(
+  email: string,
+  name: string,
+  resetUrl: string,
+) {
+  await sendEmail({
+    to: email,
+    subject: "Reset Your Password - NasByte SteCom",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #333;">Password Reset Request</h2>
+        <p>Hi ${escapeHtml(name)},</p>
+        <p>We received a request to reset your password. Click the button below to proceed:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${resetUrl}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Reset Password</a>
+        </div>
+        <p style="color: #666;">This link expires in 1 hour.</p>
+        <p style="color: #666;">If you didn't request this, please ignore this email. Your password will remain unchanged.</p>
+      </div>
+    `,
+  });
+}
