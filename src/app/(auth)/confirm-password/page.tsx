@@ -53,9 +53,14 @@ function ConfirmPasswordForm() {
         return;
       }
 
+      if (!result.confirmationToken) {
+        toast.error("Something went wrong. Please try again.");
+        return;
+      }
+
       const separator = callbackUrl.includes("?") ? "&" : "?";
       router.push(
-        `${callbackUrl}${separator}confirmed=true&token=${result.confirmationToken}`,
+        `${callbackUrl}${separator}confirmed=true&token=${encodeURIComponent(result.confirmationToken)}`,
       );
     } catch {
       toast.error("Something went wrong. Please try again.");
