@@ -66,13 +66,21 @@ export default async function ProductDetailPage({
         orderBy: { sortOrder: "asc" },
         take: 1,
       },
+      variants: {
+        where: { isDefault: true },
+        select: { price: true, compareAtPrice: true },
+      },
     },
     take: 4,
   });
 
-  const stock = product.hasVariants
-    ? product.variants.reduce((sum, v) => sum + v.stock, 0)
-    : product.stock;
+  const defaultVariant =
+    product.variants.find((v) => v.isDefault) ?? product.variants[0];
+  const stock = product.variants.reduce((sum, v) => sum + v.stock, 0);
+  const price = Number(defaultVariant?.price ?? product.minPrice ?? 0);
+  const compareAtPrice = defaultVariant?.compareAtPrice
+    ? Number(defaultVariant.compareAtPrice)
+    : null;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -86,10 +94,8 @@ export default async function ProductDetailPage({
           <ProductInfo
             name={product.name}
             category={product.category}
-            price={Number(product.price)}
-            compareAtPrice={
-              product.compareAtPrice ? Number(product.compareAtPrice) : null
-            }
+            price={price}
+            compareAtPrice={compareAtPrice}
             averageRating={Number(product.averageRating)}
             reviewCount={product.reviewCount}
             description={product.description}
@@ -103,7 +109,7 @@ export default async function ProductDetailPage({
                 ...v,
                 price: Number(v.price),
               }))}
-              selectedVariantId={null}
+              selectedVariantId={defaultVariant?.id ?? null}
               onSelectVariant={() => {}}
             />
           )}
@@ -111,10 +117,10 @@ export default async function ProductDetailPage({
           <ProductQuantity quantity={1} maxStock={stock} onChange={() => {}} />
 
           <ProductActions
-            productId={product.id}
+            variantId={defaultVariant?.id ?? ""}
             name={product.name}
             slug={product.slug}
-            price={Number(product.price)}
+            price={price}
             image={product.productImages[0]?.path}
             stock={stock}
             quantity={1}
@@ -141,8 +147,10 @@ export default async function ProductDetailPage({
         <ProductRelated
           products={relatedProducts.map((p) => ({
             ...p,
-            price: Number(p.price),
-            compareAtPrice: p.compareAtPrice ? Number(p.compareAtPrice) : null,
+            price: Number(p.variants[0]?.price ?? p.minPrice ?? 0),
+            compareAtPrice: p.variants[0]?.compareAtPrice
+              ? Number(p.variants[0].compareAtPrice)
+              : null,
             averageRating: Number(p.averageRating),
           }))}
         />

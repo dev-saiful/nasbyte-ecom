@@ -27,11 +27,12 @@ export async function PATCH(
       );
     }
 
-    const existing = await prisma.product.findUnique({
-      where: { id, deletedAt: null },
+    const existing = await prisma.productVariant.findUnique({
+      where: { id },
+      include: { product: { select: { id: true } } },
     });
-    if (!existing) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    if (!existing || existing.product.deletedAt) {
+      return NextResponse.json({ error: "Variant not found" }, { status: 404 });
     }
 
     const oldStock = existing.stock;
@@ -39,11 +40,11 @@ export async function PATCH(
     const delta = newStock - oldStock;
 
     if (delta === 0) {
-      return NextResponse.json({ product: existing, log: null });
+      return NextResponse.json({ variant: existing, log: null });
     }
 
-    const [product, log] = await prisma.$transaction([
-      prisma.product.update({
+    const [variant, log] = await prisma.$transaction([
+      prisma.productVariant.update({
         where: { id },
         data: { stock: newStock },
       }),
@@ -52,13 +53,14 @@ export async function PATCH(
           oldStock,
           newStock,
           delta,
-          productId: id,
+          productId: existing.product.id,
+          variantId: id,
           userId: session.user.id,
         },
       }),
     ]);
 
-    return NextResponse.json({ product, log });
+    return NextResponse.json({ variant, log });
   } catch (error) {
     console.error("Admin inventory PATCH error:", error);
     return NextResponse.json(

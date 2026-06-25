@@ -19,12 +19,17 @@ export async function GET(request: Request) {
     );
     const skip = (page - 1) * limit;
 
-    const where: Record<string, unknown> = { isActive: true, deletedAt: null };
+    const where: Record<string, unknown> = {
+      isActive: true,
+      deletedAt: null,
+      product: { deletedAt: null },
+    };
 
     if (search) {
       where.OR = [
         { name: { contains: search, mode: "insensitive" } },
         { sku: { contains: search, mode: "insensitive" } },
+        { product: { name: { contains: search, mode: "insensitive" } } },
       ];
     }
 
@@ -36,25 +41,36 @@ export async function GET(request: Request) {
       where.stock = { gt: 10 };
     }
 
-    const [products, total] = await Promise.all([
-      prisma.product.findMany({
+    const [variants, total] = await Promise.all([
+      prisma.productVariant.findMany({
         where,
         select: {
           id: true,
           name: true,
           sku: true,
           stock: true,
-          hasVariants: true,
+          price: true,
+          product: {
+            select: { id: true, name: true, slug: true },
+          },
         },
         orderBy: { stock: "asc" },
         skip,
         take: limit,
       }),
-      prisma.product.count({ where }),
+      prisma.productVariant.count({ where }),
     ]);
 
     return NextResponse.json({
-      products,
+      products: variants.map((v) => ({
+        id: v.id,
+        name: v.name ?? v.product.name,
+        sku: v.sku,
+        stock: v.stock,
+        price: Number(v.price),
+        productName: v.product.name,
+        productId: v.product.id,
+      })),
       total,
       page,
       totalPages: Math.ceil(total / limit),

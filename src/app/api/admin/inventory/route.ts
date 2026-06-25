@@ -9,18 +9,22 @@ export async function GET() {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const baseWhere = { isActive: true, deletedAt: null };
+    const baseWhere = {
+      isActive: true,
+      deletedAt: null,
+      product: { deletedAt: null },
+    };
 
-    const [totalProducts, lowStock, outOfStock, stockAggregate] =
+    const [totalVariants, lowStock, outOfStock, stockAggregate] =
       await Promise.all([
-        prisma.product.count({ where: baseWhere }),
-        prisma.product.count({
+        prisma.productVariant.count({ where: baseWhere }),
+        prisma.productVariant.count({
           where: { ...baseWhere, stock: { gt: 0, lte: 10 } },
         }),
-        prisma.product.count({
+        prisma.productVariant.count({
           where: { ...baseWhere, stock: 0 },
         }),
-        prisma.product.aggregate({
+        prisma.productVariant.aggregate({
           where: baseWhere,
           _sum: { stock: true },
         }),
@@ -28,7 +32,7 @@ export async function GET() {
 
     return NextResponse.json({
       stats: {
-        totalProducts,
+        totalProducts: totalVariants,
         lowStock,
         outOfStock,
         totalStock: stockAggregate._sum.stock || 0,

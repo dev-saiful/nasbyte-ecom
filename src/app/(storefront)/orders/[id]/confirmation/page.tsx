@@ -17,7 +17,11 @@ export default async function OrderConfirmationPage({
   const order = await prisma.order.findUnique({
     where: { id, deletedAt: null },
     include: {
-      items: true,
+      items: {
+        include: {
+          variant: { select: { id: true, name: true } },
+        },
+      },
     },
   });
 

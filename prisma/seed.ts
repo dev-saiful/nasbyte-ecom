@@ -175,11 +175,18 @@ async function main() {
       create: {
         name: product.name,
         slug: product.slug,
-        price: product.price,
         description: product.description,
-        stock: product.stock,
         categoryId: product.categoryId,
         isFeatured: Math.random() > 0.7,
+        minPrice: product.price,
+        variants: {
+          create: {
+            price: product.price,
+            stock: product.stock,
+            isDefault: true,
+            isActive: true,
+          },
+        },
       },
     });
     createdProducts.push(created);

@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -31,17 +30,19 @@ export async function POST(request: Request) {
     const cartItems = await prisma.cartItem.findMany({
       where: { userId: session.user.id },
       include: {
-        product: {
-          include: {
-            productImages: {
-              select: { path: true },
-              orderBy: { sortOrder: "asc" as const },
-              take: 1,
-            },
-          },
-        },
         variant: {
           include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                productImages: {
+                  select: { path: true },
+                  orderBy: { sortOrder: "asc" as const },
+                  take: 1,
+                },
+              },
+            },
             variantOptions: {
               include: {
                 optionValue: {
@@ -59,43 +60,24 @@ export async function POST(request: Request) {
     }
 
     const order = await prisma.$transaction(async (tx) => {
-      const productIds = [
-        ...new Set(
-          cartItems.filter((i) => !i.variantId).map((i) => i.productId),
-        ),
-      ];
-      const variantIds = [
-        ...new Set(
-          cartItems
-            .filter((i) => i.variantId)
-            .map((i) => i.variantId as string),
-        ),
-      ];
+      const variantIds = [...new Set(cartItems.map((i) => i.variantId))];
 
-      const lockedProducts = await tx.$queryRaw<
-        { id: string; stock: number }[]
-      >`
-        SELECT id, stock FROM products WHERE id = ANY(${productIds}::uuid[]) FOR UPDATE
-      `;
       const lockedVariants = await tx.$queryRaw<
         { id: string; stock: number }[]
       >`
         SELECT id, stock FROM product_variants WHERE id = ANY(${variantIds}::uuid[]) FOR UPDATE
       `;
 
-      const productStockMap = new Map(
-        lockedProducts.map((p) => [p.id, p.stock]),
-      );
       const variantStockMap = new Map(
         lockedVariants.map((v) => [v.id, v.stock]),
       );
 
       for (const item of cartItems) {
-        const stock = item.variantId
-          ? (variantStockMap.get(item.variantId) ?? 0)
-          : (productStockMap.get(item.productId) ?? 0);
+        const stock = variantStockMap.get(item.variantId) ?? 0;
         if (item.quantity > stock) {
-          throw new Error(`Insufficient stock for ${item.product.name}`);
+          throw new Error(
+            `Insufficient stock for ${item.variant.product.name}`,
+          );
         }
       }
 
@@ -111,8 +93,7 @@ export async function POST(request: Request) {
       }
 
       const subtotal = cartItems.reduce(
-        (sum, item) =>
-          sum + Number(item.variant?.price ?? item.price) * item.quantity,
+        (sum, item) => sum + Number(item.variant.price) * item.quantity,
         0,
       );
       const total = subtotal + SHIPPING_COST;
@@ -132,48 +113,36 @@ export async function POST(request: Request) {
           userId: session.user.id,
           items: {
             create: cartItems.map((item) => ({
-              productName: item.product.name,
-              productImage: item.product.productImages[0]?.path ?? null,
-              variantDetails: item.variant
-                ? Object.fromEntries(
-                    item.variant.variantOptions.map((vo) => [
-                      vo.optionValue.option.name,
-                      vo.optionValue.value,
-                    ]),
-                  )
-                : Prisma.JsonNull,
-              price: item.variant?.price ?? item.price,
+              productName: item.variant.product.name,
+              productImage: item.variant.product.productImages[0]?.path ?? null,
+              variantDetails: Object.fromEntries(
+                item.variant.variantOptions.map((vo) => [
+                  vo.optionValue.option.name,
+                  vo.optionValue.value,
+                ]),
+              ),
+              price: item.variant.price,
               quantity: item.quantity,
-              total: Number(item.variant?.price ?? item.price) * item.quantity,
-              product: { connect: { id: item.productId } },
-              variant: item.variantId
-                ? { connect: { id: item.variantId } }
-                : undefined,
+              total: item.variant.price * item.quantity,
+              productId: item.variant.product.id,
+              variantId: item.variantId,
             })),
           },
         },
       });
 
       for (const item of cartItems) {
-        const oldStock = item.variantId
-          ? (variantStockMap.get(item.variantId) ?? 0)
-          : (productStockMap.get(item.productId) ?? 0);
+        const oldStock = variantStockMap.get(item.variantId) ?? 0;
 
-        if (item.variantId) {
-          await tx.productVariant.update({
-            where: { id: item.variantId },
-            data: { stock: { decrement: item.quantity } },
-          });
-        } else {
-          await tx.product.update({
-            where: { id: item.productId },
-            data: { stock: { decrement: item.quantity } },
-          });
-        }
+        await tx.productVariant.update({
+          where: { id: item.variantId },
+          data: { stock: { decrement: item.quantity } },
+        });
 
         await tx.inventoryStockLog.create({
           data: {
-            productId: item.productId,
+            productId: item.variant.product.id,
+            variantId: item.variantId,
             userId: session.user.id,
             oldStock,
             newStock: oldStock - item.quantity,

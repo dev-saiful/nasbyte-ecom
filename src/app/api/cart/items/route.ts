@@ -17,15 +17,19 @@ export async function POST(request: Request) {
     const body = await request.json();
     const data = cartItemSchema.parse(body);
 
-    const product = await prisma.product.findUnique({
-      where: { id: data.productId, deletedAt: null },
+    const variant = await prisma.productVariant.findUnique({
+      where: { id: data.variantId },
+      include: { product: { select: { id: true } } },
     });
 
-    if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    if (!variant || variant.product.deletedAt) {
+      return NextResponse.json(
+        { error: "Product variant not found" },
+        { status: 404 },
+      );
     }
 
-    if (product.stock < data.quantity) {
+    if (variant.stock < data.quantity) {
       return NextResponse.json(
         { error: "Insufficient stock" },
         { status: 400 },
@@ -35,14 +39,13 @@ export async function POST(request: Request) {
     const existingItem = await prisma.cartItem.findFirst({
       where: {
         userId: session.user.id,
-        productId: data.productId,
-        variantId: data.variantId ?? null,
+        variantId: data.variantId,
       },
     });
 
     if (existingItem) {
       const newQuantity = existingItem.quantity + data.quantity;
-      if (newQuantity > product.stock) {
+      if (newQuantity > variant.stock) {
         return NextResponse.json(
           { error: "Insufficient stock" },
           { status: 400 },
@@ -57,10 +60,8 @@ export async function POST(request: Request) {
       await prisma.cartItem.create({
         data: {
           userId: session.user.id,
-          productId: data.productId,
-          variantId: data.variantId ?? null,
+          variantId: data.variantId,
           quantity: data.quantity,
-          price: product.price,
         },
       });
     }

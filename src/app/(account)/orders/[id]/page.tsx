@@ -25,7 +25,11 @@ export default async function OrderDetailPage({
   const order = await prisma.order.findFirst({
     where: { id, userId: session.user.id, deletedAt: null },
     include: {
-      items: true,
+      items: {
+        include: {
+          variant: { select: { id: true, name: true } },
+        },
+      },
     },
   });
 

@@ -81,6 +81,7 @@ model Product {
   slug               String              @unique @db.VarChar(255)
   description        String?             @db.Text
   features           Json?
+  minPrice           Decimal?            @map("min_price") @db.Decimal(10, 2)
   averageRating      Decimal             @default(0) @map("average_rating") @db.Decimal(2, 1)
   reviewCount        Int                 @default(0) @map("review_count")
   /// UI hint only — no business logic should branch on this flag

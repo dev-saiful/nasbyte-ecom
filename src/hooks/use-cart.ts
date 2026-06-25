@@ -7,20 +7,16 @@ export function useCart() {
     store.addItem(item);
   };
 
-  const removeItem = (productId: string, variantId?: string | null) => {
-    store.removeItem(productId, variantId);
+  const removeItem = (variantId: string) => {
+    store.removeItem(variantId);
   };
 
-  const updateQuantity = (
-    productId: string,
-    quantity: number,
-    variantId?: string | null,
-  ) => {
+  const updateQuantity = (variantId: string, quantity: number) => {
     if (quantity < 1) {
-      removeItem(productId, variantId);
+      removeItem(variantId);
       return;
     }
-    store.updateQuantity(productId, quantity, variantId);
+    store.updateQuantity(variantId, quantity);
   };
 
   const clearCart = () => {

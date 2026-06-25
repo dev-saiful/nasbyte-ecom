@@ -8,8 +8,7 @@ import { useCart } from "@/hooks/use-cart";
 import { formatBDT } from "@/lib/utils";
 
 interface CartItemProps {
-  productId: string;
-  variantId?: string | null;
+  variantId: string;
   name: string;
   slug: string;
   price: number;
@@ -20,7 +19,6 @@ interface CartItemProps {
 }
 
 export function CartItem({
-  productId,
   variantId,
   name,
   slug,
@@ -74,7 +72,7 @@ export function CartItem({
               variant="outline"
               size="icon"
               className="size-8"
-              onClick={() => updateQuantity(productId, quantity - 1, variantId)}
+              onClick={() => updateQuantity(variantId, quantity - 1)}
               disabled={quantity <= 1}
             >
               <Minus className="size-3" />
@@ -84,7 +82,7 @@ export function CartItem({
               variant="outline"
               size="icon"
               className="size-8"
-              onClick={() => updateQuantity(productId, quantity + 1, variantId)}
+              onClick={() => updateQuantity(variantId, quantity + 1)}
               disabled={quantity >= stock}
             >
               <Plus className="size-3" />
@@ -97,7 +95,7 @@ export function CartItem({
               variant="ghost"
               size="icon"
               className="size-8 text-destructive"
-              onClick={() => removeItem(productId, variantId)}
+              onClick={() => removeItem(variantId)}
             >
               <Trash2 className="size-4" />
             </Button>

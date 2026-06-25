@@ -14,6 +14,10 @@ export default async function StorefrontHomePage() {
           orderBy: { sortOrder: "asc" },
           take: 1,
         },
+        variants: {
+          where: { isDefault: true },
+          select: { price: true, compareAtPrice: true },
+        },
       },
       orderBy: { createdAt: "desc" },
       take: 8,
@@ -140,9 +144,11 @@ export default async function StorefrontHomePage() {
                 key={product.id}
                 product={{
                   ...product,
-                  price: Number(product.price),
-                  compareAtPrice: product.compareAtPrice
-                    ? Number(product.compareAtPrice)
+                  price: Number(
+                    product.variants[0]?.price ?? product.minPrice ?? 0,
+                  ),
+                  compareAtPrice: product.variants[0]?.compareAtPrice
+                    ? Number(product.variants[0].compareAtPrice)
                     : null,
                   averageRating: Number(product.averageRating),
                 }}

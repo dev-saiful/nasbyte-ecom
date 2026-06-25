@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 
 interface ProductActionsProps {
-  productId: string;
-  variantId?: string | null;
+  variantId: string;
   name: string;
   slug: string;
   price: number;
@@ -19,7 +18,6 @@ interface ProductActionsProps {
 }
 
 export function ProductActions({
-  productId,
   variantId,
   name,
   slug,
@@ -39,7 +37,6 @@ export function ProductActions({
     }
 
     addItem({
-      productId,
       variantId,
       name,
       slug,

@@ -42,10 +42,6 @@ export function AdminProductForm({
     defaultValues: {
       name: initialData?.name ?? "",
       description: initialData?.description ?? "",
-      price: initialData?.price ?? 0,
-      compareAtPrice: initialData?.compareAtPrice ?? undefined,
-      sku: initialData?.sku ?? "",
-      stock: initialData?.stock ?? 0,
       categoryId: initialData?.categoryId ?? null,
       hasVariants: initialData?.hasVariants ?? false,
       isFeatured: initialData?.isFeatured ?? false,
@@ -108,68 +104,20 @@ export function AdminProductForm({
             <Textarea id="description" {...register("description")} rows={4} />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="categoryId">Category</Label>
-              <select
-                id="categoryId"
-                {...register("categoryId")}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                <option value="">No Category</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="sku">SKU</Label>
-              <Input id="sku" {...register("sku")} />
-            </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="space-y-2">
-              <Label htmlFor="price">Price (BDT) *</Label>
-              <Input
-                id="price"
-                type="number"
-                step="0.01"
-                {...register("price", { valueAsNumber: true })}
-              />
-              {errors.price && (
-                <p className="text-sm text-destructive">
-                  {errors.price.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="compareAtPrice">Compare at Price</Label>
-              <Input
-                id="compareAtPrice"
-                type="number"
-                step="0.01"
-                {...register("compareAtPrice", { valueAsNumber: true })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="stock">Stock *</Label>
-              <Input
-                id="stock"
-                type="number"
-                {...register("stock", { valueAsNumber: true })}
-              />
-              {errors.stock && (
-                <p className="text-sm text-destructive">
-                  {errors.stock.message}
-                </p>
-              )}
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="categoryId">Category</Label>
+            <select
+              id="categoryId"
+              {...register("categoryId")}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="">No Category</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
           </div>
         </CardContent>
       </Card>

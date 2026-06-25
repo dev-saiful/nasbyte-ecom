@@ -32,9 +32,9 @@ export async function GET(request: Request) {
     const orderBy = (() => {
       switch (filters.sort) {
         case "price-asc":
-          return { price: "asc" as const };
+          return { minPrice: "asc" as const };
         case "price-desc":
-          return { price: "desc" as const };
+          return { minPrice: "desc" as const };
         case "popularity":
           return { reviewCount: "desc" as const };
         default:
@@ -52,6 +52,10 @@ export async function GET(request: Request) {
             orderBy: { sortOrder: "asc" },
             take: 1,
           },
+          variants: {
+            where: { isDefault: true },
+            select: { price: true, compareAtPrice: true },
+          },
         },
         orderBy,
         skip,
@@ -65,8 +69,10 @@ export async function GET(request: Request) {
     return NextResponse.json({
       products: products.map((p) => ({
         ...p,
-        price: Number(p.price),
-        compareAtPrice: p.compareAtPrice ? Number(p.compareAtPrice) : null,
+        price: Number(p.variants[0]?.price ?? p.minPrice ?? 0),
+        compareAtPrice: p.variants[0]?.compareAtPrice
+          ? Number(p.variants[0].compareAtPrice)
+          : null,
         averageRating: Number(p.averageRating),
       })),
       pagination: {

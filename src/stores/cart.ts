@@ -3,8 +3,7 @@ import { persist } from "zustand/middleware";
 
 export interface CartItem {
   id: string;
-  productId: string;
-  variantId?: string | null;
+  variantId: string;
   name: string;
   slug: string;
   price: number;
@@ -17,12 +16,8 @@ export interface CartItem {
 interface CartStore {
   items: CartItem[];
   addItem: (item: Omit<CartItem, "id">) => void;
-  removeItem: (productId: string, variantId?: string | null) => void;
-  updateQuantity: (
-    productId: string,
-    quantity: number,
-    variantId?: string | null,
-  ) => void;
+  removeItem: (variantId: string) => void;
+  updateQuantity: (variantId: string, quantity: number) => void;
   clearCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
@@ -35,8 +30,7 @@ export const useCartStore = create<CartStore>()(
       addItem: (item) =>
         set((state) => {
           const existingIndex = state.items.findIndex(
-            (i) =>
-              i.productId === item.productId && i.variantId === item.variantId,
+            (i) => i.variantId === item.variantId,
           );
           if (existingIndex > -1) {
             const newItems = [...state.items];
@@ -47,18 +41,14 @@ export const useCartStore = create<CartStore>()(
             items: [...state.items, { ...item, id: crypto.randomUUID() }],
           };
         }),
-      removeItem: (productId, variantId) =>
+      removeItem: (variantId) =>
         set((state) => ({
-          items: state.items.filter(
-            (i) => !(i.productId === productId && i.variantId === variantId),
-          ),
+          items: state.items.filter((i) => i.variantId !== variantId),
         })),
-      updateQuantity: (productId, quantity, variantId) =>
+      updateQuantity: (variantId, quantity) =>
         set((state) => ({
           items: state.items.map((i) =>
-            i.productId === productId && i.variantId === variantId
-              ? { ...i, quantity }
-              : i,
+            i.variantId === variantId ? { ...i, quantity } : i,
           ),
         })),
       clearCart: () => set({ items: [] }),

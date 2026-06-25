@@ -27,9 +27,7 @@ export async function PATCH(_request: Request, { params }: RouteParams) {
       data: { isActive: !product.isActive },
     });
 
-    return NextResponse.json({
-      product: { ...updated, price: Number(updated.price) },
-    });
+    return NextResponse.json({ product: updated });
   } catch (error) {
     console.error("Admin product toggle error:", error);
     return NextResponse.json(

@@ -24,6 +24,7 @@ export async function GET(request: Request) {
             price: true,
             quantity: true,
             total: true,
+            variantDetails: true,
           },
         },
       },

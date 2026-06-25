@@ -18,10 +18,7 @@ interface Product {
   name: string;
   slug: string;
   description: string | null;
-  price: number;
-  compareAtPrice: number | null;
-  sku: string | null;
-  stock: number;
+  minPrice: number | null;
   features: string[] | null;
   hasVariants: boolean;
   isFeatured: boolean;
@@ -42,6 +39,7 @@ interface Product {
     price: number;
     stock: number;
     isActive: boolean;
+    isDefault: boolean;
     optionValues: Record<string, string>;
   }[];
 }
@@ -114,31 +112,11 @@ export default function AdminProductDetailPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
-                    SKU
-                  </p>
-                  <p>{product.sku ?? "—"}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
                     Price
                   </p>
-                  <p className="font-medium">{formatBDT(product.price)}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Compare at
+                  <p className="font-medium">
+                    {product.minPrice ? formatBDT(product.minPrice) : "—"}
                   </p>
-                  <p>
-                    {product.compareAtPrice
-                      ? formatBDT(product.compareAtPrice)
-                      : "—"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Stock
-                  </p>
-                  <p>{product.stock}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
@@ -148,6 +126,12 @@ export default function AdminProductDetailPage() {
                     {product.averageRating.toFixed(1)} ({product.reviewCount}{" "}
                     reviews)
                   </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Total Stock
+                  </p>
+                  <p>{product.variants.reduce((sum, v) => sum + v.stock, 0)}</p>
                 </div>
               </div>
               {product.description && (
@@ -242,6 +226,11 @@ export default function AdminProductDetailPage() {
                   <div key={v.id} className="rounded-md border p-3 text-sm">
                     <div className="font-medium">
                       {v.name || Object.values(v.optionValues).join(" / ")}
+                      {v.isDefault && (
+                        <Badge variant="secondary" className="ml-2 text-xs">
+                          Default
+                        </Badge>
+                      )}
                     </div>
                     <div className="text-muted-foreground">
                       {formatBDT(v.price)} · Stock: {v.stock}

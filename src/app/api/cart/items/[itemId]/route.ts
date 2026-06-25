@@ -27,7 +27,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     const cartItem = await prisma.cartItem.findFirst({
       where: { id: itemId, userId: session.user.id },
-      include: { product: true },
+      include: { variant: true },
     });
 
     if (!cartItem) {
@@ -37,7 +37,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       );
     }
 
-    if (quantity > cartItem.product.stock) {
+    if (quantity > cartItem.variant.stock) {
       return NextResponse.json(
         { error: "Insufficient stock" },
         { status: 400 },

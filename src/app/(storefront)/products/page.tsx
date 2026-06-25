@@ -38,9 +38,9 @@ export default async function ProductsPage({
   const orderBy = (() => {
     switch (params.sort) {
       case "price-asc":
-        return { price: "asc" as const };
+        return { minPrice: "asc" as const };
       case "price-desc":
-        return { price: "desc" as const };
+        return { minPrice: "desc" as const };
       case "popularity":
         return { reviewCount: "desc" as const };
       default:
@@ -57,6 +57,10 @@ export default async function ProductsPage({
           select: { path: true, sortOrder: true },
           orderBy: { sortOrder: "asc" },
           take: 1,
+        },
+        variants: {
+          where: { isDefault: true },
+          select: { price: true, compareAtPrice: true },
         },
       },
       orderBy,
@@ -97,9 +101,9 @@ export default async function ProductsPage({
             <ProductList
               products={products.map((p) => ({
                 ...p,
-                price: Number(p.price),
-                compareAtPrice: p.compareAtPrice
-                  ? Number(p.compareAtPrice)
+                price: Number(p.variants[0]?.price ?? p.minPrice ?? 0),
+                compareAtPrice: p.variants[0]?.compareAtPrice
+                  ? Number(p.variants[0].compareAtPrice)
                   : null,
                 averageRating: Number(p.averageRating),
               }))}

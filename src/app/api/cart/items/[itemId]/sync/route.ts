@@ -4,8 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 interface SyncItem {
-  productId: string;
-  variantId?: string | null;
+  variantId: string;
   quantity: number;
 }
 
@@ -30,39 +29,37 @@ export async function POST(request: Request) {
     }
 
     for (const item of items) {
-      const product = await prisma.product.findUnique({
-        where: { id: item.productId, deletedAt: null },
+      const variant = await prisma.productVariant.findUnique({
+        where: { id: item.variantId },
+        include: { product: { select: { deletedAt: true } } },
       });
 
-      if (!product) continue;
+      if (!variant || variant.product.deletedAt) continue;
 
       const existingItem = await prisma.cartItem.findFirst({
         where: {
           userId: session.user.id,
-          productId: item.productId,
-          variantId: item.variantId ?? null,
+          variantId: item.variantId,
         },
       });
 
       if (existingItem) {
         const newQuantity = Math.min(
           existingItem.quantity + item.quantity,
-          product.stock,
+          variant.stock,
         );
         await prisma.cartItem.update({
           where: { id: existingItem.id },
           data: { quantity: newQuantity },
         });
       } else {
-        const quantity = Math.min(item.quantity, product.stock);
+        const quantity = Math.min(item.quantity, variant.stock);
         if (quantity > 0) {
           await prisma.cartItem.create({
             data: {
               userId: session.user.id,
-              productId: item.productId,
-              variantId: item.variantId ?? null,
+              variantId: item.variantId,
               quantity,
-              price: product.price,
             },
           });
         }

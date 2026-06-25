@@ -35,8 +35,7 @@ export async function GET() {
     return NextResponse.json({
       products: products.map((p) => ({
         ...p,
-        price: Number(p.price),
-        compareAtPrice: p.compareAtPrice ? Number(p.compareAtPrice) : null,
+        minPrice: p.minPrice ? Number(p.minPrice) : null,
         averageRating: Number(p.averageRating),
         variantCount: p._count.variants,
       })),
@@ -68,7 +67,6 @@ export async function POST(request: Request) {
 
     const data = parsed.data;
 
-    // Generate slug, handle collision
     let slug = slugify(data.name);
     let slugAttempts = 0;
     while (slugAttempts < 5) {
@@ -84,10 +82,6 @@ export async function POST(request: Request) {
           name: data.name,
           slug,
           description: data.description,
-          price: data.price,
-          compareAtPrice: data.compareAtPrice,
-          sku: data.sku,
-          stock: data.stock,
           categoryId: data.categoryId,
           hasVariants: data.hasVariants,
           isFeatured: data.isFeatured,
@@ -96,7 +90,6 @@ export async function POST(request: Request) {
         },
       });
 
-      // Create options and their values
       if (data.options && data.options.length > 0) {
         for (const option of data.options) {
           const createdOption = await tx.productOption.create({
@@ -119,7 +112,6 @@ export async function POST(request: Request) {
         }
       }
 
-      // Create variants
       if (data.variants && data.variants.length > 0) {
         const options = await tx.productOption.findMany({
           where: { productId: newProduct.id },
@@ -135,11 +127,11 @@ export async function POST(request: Request) {
               compareAtPrice: variant.compareAtPrice,
               stock: variant.stock,
               isActive: variant.isActive,
+              isDefault: variant.isDefault ?? false,
               productId: newProduct.id,
             },
           });
 
-          // Link variant to option values
           if (variant.optionValues) {
             for (const [optionName, valueName] of Object.entries(
               variant.optionValues,
@@ -159,6 +151,17 @@ export async function POST(request: Request) {
             }
           }
         }
+      }
+
+      // Update minPrice from default variant
+      const defaultVariant = await tx.productVariant.findFirst({
+        where: { productId: newProduct.id, isDefault: true },
+      });
+      if (defaultVariant) {
+        await tx.product.update({
+          where: { id: newProduct.id },
+          data: { minPrice: defaultVariant.price },
+        });
       }
 
       return newProduct;

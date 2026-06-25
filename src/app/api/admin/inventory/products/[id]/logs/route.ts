@@ -21,7 +21,7 @@ export async function GET(
     );
     const skip = (page - 1) * limit;
 
-    const where = { productId: id };
+    const where = { variantId: id };
 
     const [logs, total] = await Promise.all([
       prisma.inventoryStockLog.findMany({

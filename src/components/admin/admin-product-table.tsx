@@ -26,12 +26,9 @@ interface Product {
   id: string;
   name: string;
   slug: string;
-  price: number;
-  compareAtPrice: number | null;
-  stock: number;
+  minPrice: number | null;
   isActive: boolean;
   isFeatured: boolean;
-  sku: string | null;
   category?: { name: string; slug: string } | null;
   productImages?: { path: string; sortOrder: number }[];
   variantCount: number;
@@ -63,10 +60,9 @@ export function AdminProductTable({
           <TableRow>
             <TableHead className="w-[60px]">Image</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>SKU</TableHead>
             <TableHead>Category</TableHead>
             <TableHead className="text-right">Price</TableHead>
-            <TableHead className="text-right">Stock</TableHead>
+            <TableHead className="text-right">Variants</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="w-[50px]" />
           </TableRow>
@@ -100,26 +96,13 @@ export function AdminProductTable({
                 )}
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {product.sku ?? "—"}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
                 {product.category?.name ?? "—"}
               </TableCell>
               <TableCell className="text-right font-medium">
-                {formatBDT(product.price)}
+                {product.minPrice ? formatBDT(product.minPrice) : "—"}
               </TableCell>
-              <TableCell className="text-right">
-                <span
-                  className={
-                    product.stock === 0
-                      ? "text-destructive"
-                      : product.stock <= 10
-                        ? "text-orange-600"
-                        : ""
-                  }
-                >
-                  {product.stock}
-                </span>
+              <TableCell className="text-right text-muted-foreground">
+                {product.variantCount}
               </TableCell>
               <TableCell>
                 <Badge variant={product.isActive ? "default" : "secondary"}>

@@ -8,19 +8,23 @@ export const metadata = {
 };
 
 async function getStats() {
-  const baseWhere = { isActive: true, deletedAt: null };
+  const baseWhere = {
+    isActive: true,
+    deletedAt: null,
+    product: { deletedAt: null },
+  };
 
-  const [totalProducts, lowStock, outOfStock] = await Promise.all([
-    prisma.product.count({ where: baseWhere }),
-    prisma.product.count({
+  const [totalVariants, lowStock, outOfStock] = await Promise.all([
+    prisma.productVariant.count({ where: baseWhere }),
+    prisma.productVariant.count({
       where: { ...baseWhere, stock: { gt: 0, lte: 10 } },
     }),
-    prisma.product.count({
+    prisma.productVariant.count({
       where: { ...baseWhere, stock: 0 },
     }),
   ]);
 
-  return { totalProducts, lowStock, outOfStock };
+  return { totalProducts: totalVariants, lowStock, outOfStock };
 }
 
 export default async function AdminInventoryPage() {

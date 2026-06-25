@@ -48,10 +48,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
     return NextResponse.json({
       product: {
         ...product,
-        price: Number(product.price),
-        compareAtPrice: product.compareAtPrice
-          ? Number(product.compareAtPrice)
-          : null,
+        minPrice: product.minPrice ? Number(product.minPrice) : null,
         averageRating: Number(product.averageRating),
         variants: product.variants.map((v) => ({
           ...v,
@@ -107,10 +104,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
         data: {
           name: data.name,
           description: data.description,
-          price: data.price,
-          compareAtPrice: data.compareAtPrice,
-          sku: data.sku,
-          stock: data.stock,
           categoryId: data.categoryId,
           hasVariants: data.hasVariants,
           isFeatured: data.isFeatured,
@@ -119,9 +112,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         },
       });
 
-      // Replace options if provided
       if (data.options !== undefined) {
-        // Delete existing options (cascades to values)
         await tx.productOption.deleteMany({ where: { productId: id } });
 
         for (const option of data.options) {
@@ -145,9 +136,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         }
       }
 
-      // Replace variants if provided
       if (data.variants !== undefined) {
-        // Delete existing variants (cascades to variantOptions)
         await tx.productVariant.deleteMany({ where: { productId: id } });
 
         const options = await tx.productOption.findMany({
@@ -164,6 +153,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
               compareAtPrice: variant.compareAtPrice,
               stock: variant.stock,
               isActive: variant.isActive,
+              isDefault: variant.isDefault ?? false,
               productId: id,
             },
           });
@@ -188,6 +178,15 @@ export async function PUT(request: Request, { params }: RouteParams) {
           }
         }
       }
+
+      // Update minPrice from default variant
+      const defaultVariant = await tx.productVariant.findFirst({
+        where: { productId: id, isDefault: true },
+      });
+      await tx.product.update({
+        where: { id },
+        data: { minPrice: defaultVariant?.price ?? null },
+      });
 
       return updated;
     });

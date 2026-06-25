@@ -101,10 +101,6 @@ export const productSchema = z.object({
   name: z.string().min(1).max(255),
   slug: z.string().min(1).max(255),
   description: z.string().optional(),
-  price: z.number().positive(),
-  compareAtPrice: z.number().positive().optional(),
-  sku: z.string().max(100).optional(),
-  stock: z.number().int().min(0),
   categoryId: z.string().uuid().optional(),
   hasVariants: z.boolean().default(false),
   isFeatured: z.boolean().default(false),
@@ -136,8 +132,7 @@ export type ProductInput = z.infer<typeof productSchema>;
 export type CategoryInput = z.infer<typeof categorySchema>;
 
 export const cartItemSchema = z.object({
-  productId: z.string().uuid(),
-  variantId: z.string().uuid().optional(),
+  variantId: z.string().uuid(),
   quantity: z.number().int().min(1),
 });
 
@@ -165,16 +160,13 @@ export const productVariantSchema = z.object({
   compareAtPrice: z.number().positive().optional(),
   stock: z.number().int().min(0),
   isActive: z.boolean().optional(),
+  isDefault: z.boolean().optional(),
   optionValues: z.record(z.string(), z.string()).optional(),
 });
 
 export const adminProductSchema = z.object({
   name: z.string().min(1).max(255),
   description: z.string().optional(),
-  price: z.number().positive(),
-  compareAtPrice: z.number().positive().optional(),
-  sku: z.string().max(100).optional(),
-  stock: z.number().int().min(0),
   categoryId: z.string().uuid().optional().nullable(),
   hasVariants: z.boolean().optional(),
   isFeatured: z.boolean().optional(),

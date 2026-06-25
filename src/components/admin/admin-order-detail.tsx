@@ -28,8 +28,8 @@ interface OrderItem {
   quantity: number;
   total: number;
   variantDetails: Record<string, string> | null;
-  product: { id: string; name: string; slug: string };
-  variant: { id: string; name: string | null } | null;
+  product: { id: string; name: string; slug: string } | null;
+  variant: { id: string; name: string | null };
 }
 
 interface Order {
@@ -291,7 +291,7 @@ export function AdminOrderDetail({ orderId }: AdminOrderDetailProps) {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium">{item.productName}</p>
-                      {item.variant?.name && (
+                      {item.variant.name && (
                         <p className="text-muted-foreground text-xs">
                           {item.variant.name}
                         </p>

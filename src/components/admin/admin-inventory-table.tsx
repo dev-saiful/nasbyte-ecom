@@ -29,12 +29,14 @@ import {
 } from "@/components/ui/table";
 import { AdminStockLogDialog } from "./admin-stock-log-dialog";
 
-interface Product {
+interface ProductVariant {
   id: string;
   name: string;
   sku: string | null;
   stock: number;
-  hasVariants: boolean;
+  price: number;
+  productName: string;
+  productId: string;
 }
 
 function getStockStatus(stock: number) {
@@ -45,7 +47,7 @@ function getStockStatus(stock: number) {
 }
 
 export function AdminInventoryTable() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductVariant[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -93,7 +95,7 @@ export function AdminInventoryTable() {
     fetchProducts();
   }, [fetchProducts]);
 
-  function startEdit(product: Product) {
+  function startEdit(product: ProductVariant) {
     setEditingId(product.id);
     setEditValue(String(product.stock));
   }
@@ -103,7 +105,7 @@ export function AdminInventoryTable() {
     setEditValue("");
   }
 
-  async function saveStock(productId: string) {
+  async function saveStock(variantId: string) {
     const newStock = Number(editValue);
     if (Number.isNaN(newStock) || newStock < 0) {
       cancelEdit();
@@ -112,7 +114,7 @@ export function AdminInventoryTable() {
 
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/inventory/products/${productId}`, {
+      const res = await fetch(`/api/admin/inventory/products/${variantId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ stock: newStock }),
@@ -121,7 +123,7 @@ export function AdminInventoryTable() {
       const data = await res.json();
       setProducts((prev) =>
         prev.map((p) =>
-          p.id === productId ? { ...p, stock: data.product.stock } : p,
+          p.id === variantId ? { ...p, stock: data.variant.stock } : p,
         ),
       );
       cancelEdit();
@@ -132,9 +134,9 @@ export function AdminInventoryTable() {
     }
   }
 
-  function openLogs(product: Product) {
+  function openLogs(product: ProductVariant) {
     setLogProductId(product.id);
-    setLogProductName(product.name);
+    setLogProductName(product.name || product.productName);
   }
 
   if (loading && products.length === 0) {
@@ -181,7 +183,7 @@ export function AdminInventoryTable() {
         </div>
 
         <div className="text-muted-foreground text-sm">
-          {total} product{total !== 1 ? "s" : ""} found
+          {total} variant{total !== 1 ? "s" : ""} found
         </div>
 
         <div className="rounded-md border">
@@ -203,10 +205,10 @@ export function AdminInventoryTable() {
                 return (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">
-                      {product.name}
-                      {product.hasVariants && (
+                      {product.name || product.productName}
+                      {product.name && product.name !== product.productName && (
                         <span className="text-muted-foreground ml-1 text-xs">
-                          (has variants)
+                          ({product.productName})
                         </span>
                       )}
                     </TableCell>

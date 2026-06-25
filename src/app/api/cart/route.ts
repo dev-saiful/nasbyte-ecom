@@ -13,26 +13,24 @@ export async function GET() {
     const cartItems = await prisma.cartItem.findMany({
       where: { userId: session.user.id },
       include: {
-        product: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            price: true,
-            stock: true,
-            productImages: {
-              select: { path: true },
-              take: 1,
-              orderBy: { sortOrder: "asc" },
-            },
-          },
-        },
         variant: {
           select: {
             id: true,
             name: true,
             price: true,
             stock: true,
+            product: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                productImages: {
+                  select: { path: true },
+                  take: 1,
+                  orderBy: { sortOrder: "asc" },
+                },
+              },
+            },
             variantOptions: {
               include: {
                 optionValue: {
@@ -47,22 +45,19 @@ export async function GET() {
 
     const items = cartItems.map((item) => ({
       id: item.id,
-      productId: item.productId,
       variantId: item.variantId,
-      name: item.product.name,
-      slug: item.product.slug,
-      price: Number(item.variant?.price ?? item.price),
-      image: item.product.productImages[0]?.path ?? null,
+      name: item.variant.product.name,
+      slug: item.variant.product.slug,
+      price: Number(item.variant.price),
+      image: item.variant.product.productImages[0]?.path ?? null,
       quantity: item.quantity,
-      stock: item.variant?.stock ?? item.product.stock,
-      variantDetails: item.variant
-        ? Object.fromEntries(
-            item.variant.variantOptions.map((vo) => [
-              vo.optionValue.option.name,
-              vo.optionValue.value,
-            ]),
-          )
-        : null,
+      stock: item.variant.stock,
+      variantDetails: Object.fromEntries(
+        item.variant.variantOptions.map((vo) => [
+          vo.optionValue.option.name,
+          vo.optionValue.value,
+        ]),
+      ),
     }));
 
     return NextResponse.json({ items });

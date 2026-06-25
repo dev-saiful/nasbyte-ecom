@@ -5,18 +5,12 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 
 interface CartActionsProps {
-  productId: string;
-  variantId?: string | null;
+  variantId: string;
   quantity: number;
   stock: number;
 }
 
-export function CartActions({
-  productId,
-  variantId,
-  quantity,
-  stock,
-}: CartActionsProps) {
+export function CartActions({ variantId, quantity, stock }: CartActionsProps) {
   const { updateQuantity, removeItem } = useCart();
 
   return (
@@ -25,7 +19,7 @@ export function CartActions({
         variant="outline"
         size="icon"
         className="size-8"
-        onClick={() => updateQuantity(productId, quantity - 1, variantId)}
+        onClick={() => updateQuantity(variantId, quantity - 1)}
         disabled={quantity <= 1}
       >
         <Minus className="size-3" />
@@ -35,7 +29,7 @@ export function CartActions({
         variant="outline"
         size="icon"
         className="size-8"
-        onClick={() => updateQuantity(productId, quantity + 1, variantId)}
+        onClick={() => updateQuantity(variantId, quantity + 1)}
         disabled={quantity >= stock}
       >
         <Plus className="size-3" />
@@ -44,7 +38,7 @@ export function CartActions({
         variant="ghost"
         size="icon"
         className="ml-2 size-8 text-destructive"
-        onClick={() => removeItem(productId, variantId)}
+        onClick={() => removeItem(variantId)}
       >
         <Trash2 className="size-4" />
       </Button>
