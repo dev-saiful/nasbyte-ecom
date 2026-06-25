@@ -194,8 +194,8 @@ export default function AdminProductDetailPage() {
               </CardHeader>
               <CardContent>
                 <ul className="list-inside list-disc space-y-1">
-                  {product.features.map((f, i) => (
-                    <li key={i} className="text-sm">
+                  {product.features.map((f) => (
+                    <li key={f} className="text-sm">
                       {f}
                     </li>
                   ))}

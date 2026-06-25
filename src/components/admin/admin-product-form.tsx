@@ -25,7 +25,7 @@ interface Category {
 interface AdminProductFormProps {
   onSubmit: (data: AdminProductInput) => Promise<void>;
   isLoading: boolean;
-  initialData?: any;
+  initialData?: AdminProductInput | null;
   categories?: Category[];
 }
 
@@ -244,7 +244,7 @@ export function AdminProductForm({
           {features.length > 0 && (
             <div className="space-y-2">
               {features.map((feature, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={feature} className="flex items-center gap-2">
                   <Checkbox checked disabled />
                   <span className="flex-1 text-sm">{feature}</span>
                   <Button
@@ -298,8 +298,11 @@ export function AdminProductForm({
                   </Button>
                 </div>
                 <div className="space-y-2">
-                  {watch(`options.${index}.values`)?.map((_, valueIndex) => (
-                    <div key={valueIndex} className="flex items-center gap-2">
+                  {watch(`options.${index}.values`)?.map((val, valueIndex) => (
+                    <div
+                      key={`${index}-${val ?? valueIndex}`}
+                      className="flex items-center gap-2"
+                    >
                       <Input
                         placeholder="Value"
                         {...register(`options.${index}.values.${valueIndex}`)}

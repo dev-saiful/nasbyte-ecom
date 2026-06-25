@@ -12,7 +12,9 @@ export default function EditProductPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  const [initialData, setInitialData] = useState<any>(null);
+  const [initialData, setInitialData] = useState<AdminProductInput | null>(
+    null,
+  );
   const [isLoadingProduct, setIsLoadingProduct] = useState(true);
 
   useEffect(() => {

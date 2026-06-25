@@ -28,9 +28,10 @@ export async function POST(request: Request) {
 
     let matchedUser = null;
     for (const candidate of candidates) {
+      if (!candidate.passwordResetTokenHash) continue;
       const isValid = await bcrypt.compare(
         token,
-        candidate.passwordResetTokenHash!,
+        candidate.passwordResetTokenHash,
       );
       if (isValid) {
         matchedUser = candidate;

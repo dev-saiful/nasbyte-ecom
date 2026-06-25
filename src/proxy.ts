@@ -31,7 +31,7 @@ export default auth((req) => {
   // Verified-required routes
   const verifiedRequiredRoutes = ["/checkout"];
   if (verifiedRequiredRoutes.some((route) => pathname.startsWith(route))) {
-    if (session && !(session.user as any).isVerified) {
+    if (session && !session.user.isVerified) {
       return NextResponse.redirect(new URL("/verify-email", req.url));
     }
   }
@@ -44,7 +44,7 @@ export default auth((req) => {
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }
-    if ((session.user as any).role !== "ADMIN") {
+    if (session.user.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/forbidden", req.url));
     }
   }

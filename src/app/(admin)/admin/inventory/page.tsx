@@ -1,6 +1,6 @@
-import { Package, AlertTriangle, XCircle } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertTriangle, Package, XCircle } from "lucide-react";
 import { AdminInventoryTable } from "@/components/admin/admin-inventory-table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 
 export const metadata = {

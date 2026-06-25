@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
 import {
-  Search,
-  Save,
-  X,
-  History,
   ChevronLeft,
   ChevronRight,
+  History,
+  Save,
+  Search,
+  X,
 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,7 +27,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { AdminStockLogDialog } from "./admin-stock-log-dialog";
 
 interface Product {
@@ -40,8 +40,7 @@ interface Product {
 function getStockStatus(stock: number) {
   if (stock === 0)
     return { label: "Out of Stock", variant: "destructive" as const };
-  if (stock <= 10)
-    return { label: "Low Stock", variant: "secondary" as const };
+  if (stock <= 10) return { label: "Low Stock", variant: "secondary" as const };
   return { label: "In Stock", variant: "default" as const };
 }
 
@@ -249,6 +248,7 @@ export function AdminInventoryTable() {
                         </div>
                       ) : (
                         <button
+                          type="button"
                           className="hover:bg-muted rounded px-2 py-1 text-left font-mono text-sm"
                           onClick={() => startEdit(product)}
                         >

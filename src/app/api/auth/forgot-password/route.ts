@@ -1,5 +1,5 @@
+import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";

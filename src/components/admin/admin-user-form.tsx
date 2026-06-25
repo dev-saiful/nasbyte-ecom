@@ -1,9 +1,10 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import type { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,7 +15,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { adminUserCreateSchema, adminUserUpdateSchema } from "@/lib/validators";
-import type { z } from "zod";
 
 type CreateFormData = z.input<typeof adminUserCreateSchema>;
 type UpdateFormData = z.input<typeof adminUserUpdateSchema>;
@@ -59,7 +59,7 @@ export function AdminUserForm({ initialData }: AdminUserFormProps) {
         : "/api/admin/users";
       const method = isEdit ? "PUT" : "POST";
 
-      const body: any = { ...data };
+      const body = { ...data } as Record<string, unknown>;
       if (isEdit && !body.password) {
         delete body.password;
       }
@@ -141,7 +141,7 @@ export function AdminUserForm({ initialData }: AdminUserFormProps) {
 
       {!isEdit && (
         <div className="space-y-2">
-          <label className="text-sm font-medium">Role</label>
+          <p className="text-sm font-medium">Role</p>
           <Select
             value={role}
             onValueChange={(v) => {

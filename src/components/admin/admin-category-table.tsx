@@ -1,9 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
 import { FolderTree, Pencil, Plus, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -12,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
 import { AdminDeleteDialog } from "./admin-delete-dialog";
 
 interface Category {
@@ -32,11 +32,7 @@ export function AdminCategoryTable() {
   const [deleteName, setDeleteName] = useState("");
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  async function fetchCategories() {
+  const fetchCategories = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/categories");
       if (!res.ok) throw new Error("Failed to fetch");
@@ -47,7 +43,11 @@ export function AdminCategoryTable() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   async function handleToggleStatus(id: string) {
     setTogglingId(id);

@@ -61,8 +61,8 @@ export default function ForgotPasswordPage() {
         <CardHeader>
           <CardTitle>Check your email</CardTitle>
           <CardDescription>
-            If an account exists with that email, you&apos;ll receive a
-            password reset link shortly.
+            If an account exists with that email, you&apos;ll receive a password
+            reset link shortly.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -72,10 +72,7 @@ export default function ForgotPasswordPage() {
           </p>
         </CardContent>
         <CardFooter>
-          <Link
-            href="/login"
-            className="text-sm text-primary hover:underline"
-          >
+          <Link href="/login" className="text-sm text-primary hover:underline">
             Back to sign in
           </Link>
         </CardFooter>
@@ -88,8 +85,8 @@ export default function ForgotPasswordPage() {
       <CardHeader>
         <CardTitle>Forgot your password?</CardTitle>
         <CardDescription>
-          Enter your email address and we&apos;ll send you a link to reset
-          your password.
+          Enter your email address and we&apos;ll send you a link to reset your
+          password.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -104,9 +101,7 @@ export default function ForgotPasswordPage() {
               aria-invalid={!!errors.email}
             />
             {errors.email && (
-              <p className="text-xs text-destructive">
-                {errors.email.message}
-              </p>
+              <p className="text-xs text-destructive">{errors.email.message}</p>
             )}
           </div>
         </CardContent>

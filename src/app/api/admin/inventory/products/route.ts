@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: Request) {
   try {
     const session = await auth();
-    if (!session?.user || (session.user as any).role !== "ADMIN") {
+    if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     );
     const skip = (page - 1) * limit;
 
-    const where: any = { isActive: true, deletedAt: null };
+    const where: Record<string, unknown> = { isActive: true, deletedAt: null };
 
     if (search) {
       where.OR = [

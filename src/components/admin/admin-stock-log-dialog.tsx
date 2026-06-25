@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -15,8 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface StockLog {
   id: string;
@@ -45,28 +45,31 @@ export function AdminStockLogDialog({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const fetchLogs = useCallback(
+    async (p: number) => {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `/api/admin/inventory/products/${productId}/logs?page=${p}&limit=10`,
+        );
+        if (!res.ok) throw new Error("Failed");
+        const data = await res.json();
+        setLogs(data.logs);
+        setTotalPages(data.totalPages);
+      } catch {
+        console.error("Failed to load logs");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [productId],
+  );
+
   useEffect(() => {
     if (!open || !productId) return;
     setPage(1);
     fetchLogs(1);
-  }, [open, productId]);
-
-  async function fetchLogs(p: number) {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `/api/admin/inventory/products/${productId}/logs?page=${p}&limit=10`,
-      );
-      if (!res.ok) throw new Error("Failed");
-      const data = await res.json();
-      setLogs(data.logs);
-      setTotalPages(data.totalPages);
-    } catch {
-      console.error("Failed to load logs");
-    } finally {
-      setLoading(false);
-    }
-  }
+  }, [open, productId, fetchLogs]);
 
   function changePage(p: number) {
     setPage(p);
@@ -81,7 +84,9 @@ export function AdminStockLogDialog({
         </DialogHeader>
 
         {loading ? (
-          <div className="text-muted-foreground py-8 text-center">Loading...</div>
+          <div className="text-muted-foreground py-8 text-center">
+            Loading...
+          </div>
         ) : logs.length === 0 ? (
           <div className="text-muted-foreground py-8 text-center">
             No stock changes recorded yet

@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
 import {
-  Search,
   Check,
-  X,
-  Trash2,
   ChevronLeft,
   ChevronRight,
+  Search,
+  Trash2,
+  X,
 } from "lucide-react";
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -27,7 +29,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { AdminDeleteDialog } from "./admin-delete-dialog";
 
 interface Review {
@@ -307,9 +308,12 @@ export function AdminReviewTable() {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {review.product.productImages[0]?.path && (
-                      <img
+                      <Image
                         src={review.product.productImages[0].path}
                         alt=""
+                        width={32}
+                        height={32}
+                        unoptimized
                         className="h-8 w-8 rounded object-cover"
                       />
                     )}

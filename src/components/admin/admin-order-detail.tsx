@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, Package } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -276,9 +277,12 @@ export function AdminOrderDetail({ orderId }: AdminOrderDetailProps) {
                   <div key={item.id} className="flex items-center gap-4">
                     <div className="bg-muted flex h-12 w-12 items-center justify-center rounded">
                       {item.productImage ? (
-                        <img
+                        <Image
                           src={item.productImage}
                           alt={item.productName}
+                          width={48}
+                          height={48}
+                          unoptimized
                           className="h-12 w-12 rounded object-cover"
                         />
                       ) : (
@@ -347,7 +351,7 @@ export function AdminOrderDetail({ orderId }: AdminOrderDetailProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Order Status</label>
+                <p className="text-sm font-medium">Order Status</p>
                 <div className="flex gap-2">
                   <Select
                     value={order.status}
@@ -369,7 +373,7 @@ export function AdminOrderDetail({ orderId }: AdminOrderDetailProps) {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Payment Status</label>
+                <p className="text-sm font-medium">Payment Status</p>
                 <div className="flex gap-2">
                   <Select
                     value={order.paymentStatus}

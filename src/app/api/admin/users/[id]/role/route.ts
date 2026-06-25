@@ -9,7 +9,7 @@ export async function PATCH(
 ) {
   try {
     const session = await auth();
-    if (!session?.user || (session.user as any).role !== "ADMIN") {
+    if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -24,7 +24,7 @@ export async function PATCH(
     }
 
     // Prevent self-demotion
-    if (id === (session.user as any).id) {
+    if (id === session.user.id) {
       return NextResponse.json(
         { error: "Cannot change your own role" },
         { status: 400 },

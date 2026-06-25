@@ -17,10 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  type ResetPasswordInput,
-  resetPasswordSchema,
-} from "@/lib/validators";
+import { type ResetPasswordInput, resetPasswordSchema } from "@/lib/validators";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -104,10 +101,7 @@ function ResetPasswordForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link
-            href="/login"
-            className="text-sm text-primary hover:underline"
-          >
+          <Link href="/login" className="text-sm text-primary hover:underline">
             Sign in now
           </Link>
         </CardContent>
