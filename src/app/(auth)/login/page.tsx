@@ -99,12 +99,20 @@ function LoginForm() {
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Signing in..." : "Sign in"}
           </Button>
-          <p className="text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-primary hover:underline">
-              Sign up
+          <div className="flex flex-col items-center gap-2 w-full">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-muted-foreground hover:underline"
+            >
+              Forgot your password?
             </Link>
-          </p>
+            <p className="text-center text-sm text-muted-foreground">
+              Don&apos;t have an account?{" "}
+              <Link href="/register" className="text-primary hover:underline">
+                Sign up
+              </Link>
+            </p>
+          </div>
         </CardFooter>
       </form>
     </Card>
