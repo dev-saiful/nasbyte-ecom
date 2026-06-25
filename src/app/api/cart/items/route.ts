@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     const variant = await prisma.productVariant.findUnique({
       where: { id: data.variantId },
-      include: { product: { select: { id: true } } },
+      include: { product: { select: { id: true, deletedAt: true } } },
     });
 
     if (!variant || variant.product.deletedAt) {

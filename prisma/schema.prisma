@@ -178,7 +178,6 @@ model ProductImage {
 model CartItem {
   id        String         @id @default(uuid()) @db.Uuid
   quantity  Int            @default(1)
-  price     Decimal        @db.Decimal(10, 2)
   userId    String         @map("user_id") @db.Uuid
   user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   variantId String         @map("variant_id") @db.Uuid

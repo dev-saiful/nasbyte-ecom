@@ -13,12 +13,9 @@ interface Product {
   id: string;
   name: string;
   slug: string;
-  price: number;
-  compareAtPrice: number | null;
-  stock: number;
+  minPrice: number | null;
   isActive: boolean;
   isFeatured: boolean;
-  sku: string | null;
   category?: { name: string; slug: string } | null;
   productImages?: { path: string; sortOrder: number }[];
   variantCount: number;

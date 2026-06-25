@@ -29,7 +29,7 @@ export async function PATCH(
 
     const existing = await prisma.productVariant.findUnique({
       where: { id },
-      include: { product: { select: { id: true } } },
+      include: { product: { select: { id: true, deletedAt: true } } },
     });
     if (!existing || existing.product.deletedAt) {
       return NextResponse.json({ error: "Variant not found" }, { status: 404 });
