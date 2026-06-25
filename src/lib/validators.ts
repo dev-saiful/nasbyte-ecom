@@ -79,6 +79,24 @@ export const passwordChangeSchema = z
     path: ["password_confirmation"],
   });
 
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().min(1, "Reset token is required"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(128),
+    password_confirmation: z.string(),
+  })
+  .refine((data) => data.password === data.password_confirmation, {
+    message: "Passwords don't match",
+    path: ["password_confirmation"],
+  });
+
+export const confirmPasswordSchema = z.object({
+  password: z.string().min(1, "Password is required"),
+});
+
 export const productSchema = z.object({
   name: z.string().min(1).max(255),
   slug: z.string().min(1).max(255),
@@ -112,6 +130,8 @@ export type CheckoutInput = z.infer<typeof checkoutSchema>;
 export type AddressInput = z.infer<typeof addressSchema>;
 export type ProfileInput = z.infer<typeof profileSchema>;
 export type PasswordChangeInput = z.infer<typeof passwordChangeSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type ConfirmPasswordInput = z.infer<typeof confirmPasswordSchema>;
 export type ProductInput = z.infer<typeof productSchema>;
 export type CategoryInput = z.infer<typeof categorySchema>;
 
