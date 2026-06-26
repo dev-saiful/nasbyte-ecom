@@ -6,6 +6,7 @@ interface AdminKpiCardProps {
   value: string | number;
   icon: LucideIcon;
   description?: string;
+  trend?: number;
 }
 
 export function AdminKpiCard({
@@ -13,6 +14,7 @@ export function AdminKpiCard({
   value,
   icon: Icon,
   description,
+  trend,
 }: AdminKpiCardProps) {
   return (
     <Card>
@@ -23,7 +25,19 @@ export function AdminKpiCard({
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
         {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
+          <p className="text-xs text-muted-foreground">
+            {description}
+            {trend !== undefined && trend !== 0 && (
+              <span
+                className={
+                  trend > 0 ? "ml-1 text-green-600" : "ml-1 text-red-600"
+                }
+              >
+                {trend > 0 ? "+" : ""}
+                {trend}%
+              </span>
+            )}
+          </p>
         )}
       </CardContent>
     </Card>

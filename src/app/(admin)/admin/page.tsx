@@ -26,24 +26,28 @@ export default async function AdminDashboardPage() {
           value={formatBDT(stats.revenue)}
           icon={DollarSign}
           description="From completed orders"
+          trend={stats.trends?.revenue}
         />
         <AdminKpiCard
           title="Total Orders"
           value={stats.totalOrders.toLocaleString()}
           icon={ShoppingCart}
           description="Non-cancelled orders"
+          trend={stats.trends?.orders}
         />
         <AdminKpiCard
           title="Total Products"
           value={stats.totalProducts.toLocaleString()}
           icon={Package}
           description="Active products"
+          trend={stats.trends?.products}
         />
         <AdminKpiCard
           title="Total Users"
           value={stats.totalUsers.toLocaleString()}
           icon={Users}
           description="Registered users"
+          trend={stats.trends?.users}
         />
       </div>
     </div>
