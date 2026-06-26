@@ -1,5 +1,15 @@
-import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
+import {
+  AlertTriangle,
+  DollarSign,
+  Package,
+  ShoppingCart,
+  Star,
+  Users,
+} from "lucide-react";
+import { AdminDashboardCharts } from "@/components/admin/admin-dashboard-charts";
 import { AdminKpiCard } from "@/components/admin/admin-kpi-card";
+import { AdminLowStockAlerts } from "@/components/admin/admin-low-stock-alerts";
+import { AdminRecentOrders } from "@/components/admin/admin-recent-orders";
 import { formatBDT } from "@/lib/utils";
 
 async function getDashboardStats() {
@@ -49,6 +59,35 @@ export default async function AdminDashboardPage() {
           description="Registered users"
           trend={stats.trends?.users}
         />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <AdminKpiCard
+          title="Pending Reviews"
+          value={stats.pendingReviews.toLocaleString()}
+          icon={Star}
+          description="Awaiting moderation"
+        />
+        <AdminKpiCard
+          title="Low Stock"
+          value={stats.lowStockProducts.toLocaleString()}
+          icon={AlertTriangle}
+          description="Products with stock < 10"
+        />
+      </div>
+
+      <AdminDashboardCharts
+        data={{
+          revenueChart: stats.revenueChart,
+          ordersByStatus: stats.ordersByStatus,
+          usersGrowth: stats.usersGrowth,
+          categoryDistribution: stats.categoryDistribution,
+        }}
+      />
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <AdminRecentOrders orders={stats.recentOrders} />
+        <AdminLowStockAlerts items={stats.lowStockAlerts} />
       </div>
     </div>
   );
