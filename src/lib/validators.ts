@@ -172,6 +172,7 @@ export const adminProductSchema = z.object({
   isFeatured: z.boolean().optional(),
   isActive: z.boolean().optional(),
   features: z.array(z.string()).optional(),
+  imageUrl: z.string().url().optional().or(z.literal("")),
   options: z.array(productOptionSchema).optional(),
   variants: z.array(productVariantSchema).optional(),
 });

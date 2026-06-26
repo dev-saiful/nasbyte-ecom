@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, X } from "lucide-react";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-
+import { FileUpload } from "@/components/shared/file-upload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -36,6 +36,7 @@ export function AdminProductForm({
   categories = [],
 }: AdminProductFormProps) {
   const [featureInput, setFeatureInput] = useState("");
+  const [imageUrl, setImageUrl] = useState(initialData?.imageUrl ?? "");
 
   const form = useForm<AdminProductInput>({
     resolver: zodResolver(adminProductSchema),
@@ -85,7 +86,12 @@ export function AdminProductForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form
+      onSubmit={handleSubmit((data) =>
+        onSubmit({ ...data, imageUrl: imageUrl || undefined }),
+      )}
+      className="space-y-6"
+    >
       <Card>
         <CardHeader>
           <CardTitle>Basic Info</CardTitle>
@@ -118,6 +124,23 @@ export function AdminProductForm({
                 </option>
               ))}
             </select>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Product Image</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <Label>Product Image</Label>
+            <FileUpload
+              value={imageUrl}
+              onChange={setImageUrl}
+              folder="nasbyte/products"
+              label="Upload product image"
+            />
           </div>
         </CardContent>
       </Card>

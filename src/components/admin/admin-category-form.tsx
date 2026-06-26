@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
+import { FileUpload } from "@/components/shared/file-upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { categorySchema } from "@/lib/validators";
 
@@ -26,6 +28,7 @@ interface AdminCategoryFormProps {
 export function AdminCategoryForm({ initialData }: AdminCategoryFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePath, setImagePath] = useState(initialData?.imagePath ?? "");
   const isEdit = !!initialData;
 
   const {
@@ -38,7 +41,6 @@ export function AdminCategoryForm({ initialData }: AdminCategoryFormProps) {
       name: initialData?.name || "",
       slug: initialData?.slug || "",
       description: initialData?.description || "",
-      imagePath: initialData?.imagePath || "",
       isActive: initialData?.isActive ?? true,
     },
   });
@@ -46,6 +48,7 @@ export function AdminCategoryForm({ initialData }: AdminCategoryFormProps) {
   async function onSubmit(data: CategoryFormData) {
     setIsSubmitting(true);
     try {
+      const submitData = { ...data, imagePath: imagePath || undefined };
       const url = isEdit
         ? `/api/admin/categories/${initialData.id}`
         : "/api/admin/categories";
@@ -54,7 +57,7 @@ export function AdminCategoryForm({ initialData }: AdminCategoryFormProps) {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(submitData),
       });
 
       if (!res.ok) {
@@ -118,17 +121,13 @@ export function AdminCategoryForm({ initialData }: AdminCategoryFormProps) {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="imagePath" className="text-sm font-medium">
-          Image Path
-        </label>
-        <Input
-          id="imagePath"
-          {...register("imagePath")}
-          placeholder="/images/categories/..."
+        <Label>Category Image</Label>
+        <FileUpload
+          value={imagePath}
+          onChange={setImagePath}
+          folder="nasbyte/categories"
+          label="Upload category image"
         />
-        {errors.imagePath && (
-          <p className="text-destructive text-sm">{errors.imagePath.message}</p>
-        )}
       </div>
 
       <div className="flex gap-3">
