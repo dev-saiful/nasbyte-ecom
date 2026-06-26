@@ -25,7 +25,9 @@ interface Category {
 interface AdminProductFormProps {
   onSubmit: (data: AdminProductInput) => Promise<void>;
   isLoading: boolean;
-  initialData?: AdminProductInput | null;
+  initialData?:
+    | (AdminProductInput & { productImages?: { path: string }[] })
+    | null;
   categories?: Category[];
 }
 
@@ -36,7 +38,9 @@ export function AdminProductForm({
   categories = [],
 }: AdminProductFormProps) {
   const [featureInput, setFeatureInput] = useState("");
-  const [imageUrl, setImageUrl] = useState(initialData?.imageUrl ?? "");
+  const [imageUrl, setImageUrl] = useState(
+    initialData?.productImages?.[0]?.path ?? initialData?.imageUrl ?? "",
+  );
 
   const form = useForm<AdminProductInput>({
     resolver: zodResolver(adminProductSchema),

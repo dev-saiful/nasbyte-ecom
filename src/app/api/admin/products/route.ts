@@ -164,6 +164,18 @@ export async function POST(request: Request) {
         });
       }
 
+      // Persist product image if imageUrl provided
+      if (data.imageUrl) {
+        await tx.productImage.create({
+          data: {
+            path: data.imageUrl,
+            disk: "public",
+            sortOrder: 0,
+            productId: newProduct.id,
+          },
+        });
+      }
+
       return newProduct;
     });
 

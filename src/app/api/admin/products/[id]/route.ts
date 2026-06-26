@@ -188,6 +188,34 @@ export async function PUT(request: Request, { params }: RouteParams) {
         data: { minPrice: defaultVariant?.price ?? null },
       });
 
+      // Persist product image if imageUrl provided
+      if (data.imageUrl !== undefined) {
+        const existingImage = await tx.productImage.findFirst({
+          where: { productId: id },
+          orderBy: { sortOrder: "asc" },
+        });
+
+        if (data.imageUrl) {
+          if (existingImage) {
+            await tx.productImage.update({
+              where: { id: existingImage.id },
+              data: { path: data.imageUrl },
+            });
+          } else {
+            await tx.productImage.create({
+              data: {
+                path: data.imageUrl,
+                disk: "public",
+                sortOrder: 0,
+                productId: id,
+              },
+            });
+          }
+        } else if (existingImage) {
+          await tx.productImage.deleteMany({ where: { productId: id } });
+        }
+      }
+
       return updated;
     });
 
