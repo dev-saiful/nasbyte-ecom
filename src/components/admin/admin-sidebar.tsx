@@ -4,6 +4,7 @@ import {
   Flag,
   FolderTree,
   LayoutDashboard,
+  Megaphone,
   Package,
   ShoppingCart,
   Tags,
@@ -38,6 +39,12 @@ const sidebarLinks = [
     enabled: true,
   },
   { href: "/admin/promos", label: "Promos", icon: Tags, enabled: false },
+  {
+    href: "/admin/storefront/promo",
+    label: "Promo Banner",
+    icon: Megaphone,
+    enabled: true,
+  },
 ];
 
 export function AdminSidebar() {
