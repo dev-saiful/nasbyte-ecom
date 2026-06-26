@@ -13,6 +13,22 @@ describe("slugify", () => {
   it("handles multiple spaces", () => {
     expect(slugify("  Hello   World  ")).toBe("hello-world");
   });
+
+  it("strips non-ASCII characters", () => {
+    expect(slugify("সিল্ক স্কার্ফ")).toBe("");
+  });
+
+  it("does not collapse consecutive dashes", () => {
+    expect(slugify("hello---world")).toBe("hello---world");
+  });
+
+  it("trims leading and trailing dashes", () => {
+    expect(slugify("-hello-")).toBe("hello");
+  });
+
+  it("handles empty string", () => {
+    expect(slugify("")).toBe("");
+  });
 });
 
 describe("generateOrderNumber", () => {
