@@ -27,8 +27,12 @@ export function AdminLowStockAlerts({ items }: { items: LowStockItem[] }) {
           <AlertTriangle className="h-5 w-5 text-warning" />
           Low Stock Alerts
         </CardTitle>
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/admin/inventory">Manage Inventory</Link>
+        <Button
+          variant="outline"
+          size="sm"
+          render={<Link href="/admin/inventory" />}
+        >
+          Manage Inventory
         </Button>
       </CardHeader>
       <CardContent>

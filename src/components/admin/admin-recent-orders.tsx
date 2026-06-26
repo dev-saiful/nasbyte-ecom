@@ -38,8 +38,12 @@ export function AdminRecentOrders({ orders }: { orders: Order[] }) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Recent Orders</CardTitle>
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/admin/orders">View All</Link>
+        <Button
+          variant="outline"
+          size="sm"
+          render={<Link href="/admin/orders" />}
+        >
+          View All
         </Button>
       </CardHeader>
       <CardContent>

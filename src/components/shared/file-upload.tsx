@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, Upload, X } from "lucide-react";
+import Image from "next/image";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -63,11 +64,13 @@ export function FileUpload({
   return (
     <div className="space-y-2">
       {value ? (
-        <div className="relative inline-block">
-          <img
+        <div className="relative h-32 w-32 inline-block rounded-md border">
+          <Image
             src={value}
             alt="Uploaded"
-            className="h-32 w-32 rounded-md border object-cover"
+            fill
+            sizes="128px"
+            className="object-cover rounded-md"
           />
           <Button
             type="button"
