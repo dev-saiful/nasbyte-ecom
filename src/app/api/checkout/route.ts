@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { auth } from "@/lib/auth";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 import { SHIPPING_COST } from "@/lib/price";
 import { prisma } from "@/lib/prisma";
+import { sendTelegramNotification } from "@/lib/telegram";
 import { generateOrderNumber } from "@/lib/utils";
 import { checkoutSchema } from "@/lib/validators";
 
@@ -157,6 +159,43 @@ export async function POST(request: Request) {
 
       return newOrder;
     });
+
+    const [user, orderWithItems] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { name: true, email: true },
+      }),
+      prisma.order.findUnique({
+        where: { id: order.id },
+        include: { items: true },
+      }),
+    ]);
+
+    if (user && orderWithItems) {
+      await sendOrderConfirmationEmail(
+        user.email,
+        user.name,
+        orderWithItems.orderNumber,
+        Number(orderWithItems.total),
+      ).catch((err) =>
+        console.error("Failed to send order confirmation email:", err),
+      );
+
+      await sendTelegramNotification({
+        orderNumber: orderWithItems.orderNumber,
+        customerName: user.name,
+        customerPhone: orderWithItems.shippingPhone,
+        items: orderWithItems.items.map((item) => ({
+          name: item.productName,
+          quantity: item.quantity,
+          price: Number(item.price),
+        })),
+        total: Number(orderWithItems.total),
+        shippingAddress: `${orderWithItems.shippingAddress}, ${orderWithItems.shippingCity}`,
+      }).catch((err) =>
+        console.error("Failed to send Telegram notification:", err),
+      );
+    }
 
     return NextResponse.json({
       success: true,
