@@ -105,23 +105,3 @@ export function PasswordChangeForm() {
     </Card>
   );
 }
-
-export function TwoFactorSection() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Two-Factor Authentication</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground">
-          Two-factor authentication adds an extra layer of security to your
-          account. Once enabled, you will be prompted for a secure code during
-          login.
-        </p>
-        <Button variant="outline" className="mt-4" disabled>
-          Enable 2FA (Coming Soon)
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
