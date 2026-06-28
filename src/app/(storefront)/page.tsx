@@ -143,7 +143,9 @@ export default async function StorefrontHomePage() {
               <ProductCard
                 key={product.id}
                 product={{
-                  ...product,
+                  id: product.id,
+                  name: product.name,
+                  slug: product.slug,
                   price: Number(
                     product.variants[0]?.price ?? product.minPrice ?? 0,
                   ),
@@ -151,6 +153,10 @@ export default async function StorefrontHomePage() {
                     ? Number(product.variants[0].compareAtPrice)
                     : null,
                   averageRating: Number(product.averageRating),
+                  reviewCount: product.reviewCount,
+                  isFeatured: product.isFeatured,
+                  category: product.category,
+                  productImages: product.productImages,
                 }}
               />
             ))}

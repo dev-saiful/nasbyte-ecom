@@ -12,12 +12,7 @@ import { checkoutSchema } from "@/lib/validators";
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
-    }
+    const isLoggedIn = !!session?.user?.id;
 
     const body = await request.json();
     const parsed = checkoutSchema.safeParse(body);
@@ -29,33 +24,92 @@ export async function POST(request: Request) {
     }
     const data = parsed.data;
 
-    const cartItems = await prisma.cartItem.findMany({
-      where: { userId: session.user.id },
-      include: {
-        variant: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-                productImages: {
-                  select: { path: true },
-                  orderBy: { sortOrder: "asc" as const },
-                  take: 1,
+    let cartItems: {
+      variantId: string;
+      quantity: number;
+      variant: {
+        id: string;
+        price: { toString(): string };
+        stock: number;
+        product: {
+          id: string;
+          name: string;
+          productImages: { path: string }[];
+        };
+        variantOptions: {
+          optionValue: { option: { name: string }; value: string };
+        }[];
+      };
+    }[];
+
+    if (isLoggedIn) {
+      cartItems = await prisma.cartItem.findMany({
+        where: { userId: session.user?.id },
+        include: {
+          variant: {
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  productImages: {
+                    select: { path: true },
+                    orderBy: { sortOrder: "asc" as const },
+                    take: 1,
+                  },
                 },
               },
-            },
-            variantOptions: {
-              include: {
-                optionValue: {
-                  include: { option: true },
+              variantOptions: {
+                include: {
+                  optionValue: {
+                    include: { option: true },
+                  },
                 },
               },
             },
           },
         },
-      },
-    });
+      });
+    } else {
+      if (!data.cartItems || data.cartItems.length === 0) {
+        return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+      }
+
+      const variantIds = data.cartItems.map((i) => i.variantId);
+      const variants = await prisma.productVariant.findMany({
+        where: { id: { in: variantIds } },
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+              productImages: {
+                select: { path: true },
+                orderBy: { sortOrder: "asc" as const },
+                take: 1,
+              },
+            },
+          },
+          variantOptions: {
+            include: {
+              optionValue: {
+                include: { option: true },
+              },
+            },
+          },
+        },
+      });
+
+      const variantMap = new Map(variants.map((v) => [v.id, v]));
+
+      cartItems = data.cartItems.map((item) => {
+        const variant = variantMap.get(item.variantId);
+        if (!variant) {
+          throw new Error(`Product variant not found: ${item.variantId}`);
+        }
+        return { ...item, variant };
+      });
+    }
 
     if (cartItems.length === 0) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
@@ -112,7 +166,7 @@ export async function POST(request: Request) {
           shippingPhone: data.shippingPhone,
           paymentMethod: data.paymentMethod,
           notes: data.notes,
-          userId: session.user.id,
+          userId: isLoggedIn ? session.user?.id : null,
           items: {
             create: cartItems.map((item) => ({
               productName: item.variant.product.name,
@@ -145,7 +199,7 @@ export async function POST(request: Request) {
           data: {
             productId: item.variant.product.id,
             variantId: item.variantId,
-            userId: session.user.id,
+            userId: isLoggedIn ? session.user?.id : null,
             oldStock,
             newStock: oldStock - item.quantity,
             delta: -item.quantity,
@@ -153,37 +207,37 @@ export async function POST(request: Request) {
         });
       }
 
-      await tx.cartItem.deleteMany({
-        where: { userId: session.user.id },
-      });
+      if (isLoggedIn) {
+        await tx.cartItem.deleteMany({
+          where: { userId: session.user?.id },
+        });
+      }
 
       return newOrder;
     });
 
-    const [user, orderWithItems] = await Promise.all([
-      prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { name: true, email: true },
-      }),
-      prisma.order.findUnique({
-        where: { id: order.id },
-        include: { items: true },
-      }),
-    ]);
+    const orderWithItems = await prisma.order.findUnique({
+      where: { id: order.id },
+      include: { items: true },
+    });
 
-    if (user && orderWithItems) {
-      await sendOrderConfirmationEmail(
-        user.email,
-        user.name,
-        orderWithItems.orderNumber,
-        Number(orderWithItems.total),
-      ).catch((err) =>
-        console.error("Failed to send order confirmation email:", err),
-      );
+    if (orderWithItems) {
+      const customerName = data.guestName || "Customer";
+
+      if (data.guestEmail) {
+        await sendOrderConfirmationEmail(
+          data.guestEmail,
+          customerName,
+          orderWithItems.orderNumber,
+          Number(orderWithItems.total),
+        ).catch((err) =>
+          console.error("Failed to send order confirmation email:", err),
+        );
+      }
 
       await sendTelegramNotification({
         orderNumber: orderWithItems.orderNumber,
-        customerName: user.name,
+        customerName,
         customerPhone: orderWithItems.shippingPhone,
         items: orderWithItems.items.map((item) => ({
           name: item.productName,

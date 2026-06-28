@@ -1,13 +1,11 @@
 import { notFound } from "next/navigation";
-import { ProductActions } from "@/components/products/product-actions";
 import { ProductFeatures } from "@/components/products/product-features";
 import { ProductGallery } from "@/components/products/product-gallery";
 import { ProductInfo } from "@/components/products/product-info";
-import { ProductQuantity } from "@/components/products/product-quantity";
+import { ProductPurchase } from "@/components/products/product-purchase";
 import { ProductRelated } from "@/components/products/product-related";
 import { ProductReviews } from "@/components/products/product-reviews";
 import { ProductStock } from "@/components/products/product-stock";
-import { ProductVariants } from "@/components/products/product-variants";
 import { prisma } from "@/lib/prisma";
 
 interface ProductDetailPageProps {
@@ -103,27 +101,21 @@ export default async function ProductDetailPage({
 
           <ProductStock stock={stock} />
 
-          {product.hasVariants && (
-            <ProductVariants
-              variants={product.variants.map((v) => ({
-                ...v,
-                price: Number(v.price),
-              }))}
-              selectedVariantId={defaultVariant?.id ?? null}
-              onSelectVariant={() => {}}
-            />
-          )}
-
-          <ProductQuantity quantity={1} maxStock={stock} onChange={() => {}} />
-
-          <ProductActions
+          <ProductPurchase
             variantId={defaultVariant?.id ?? ""}
             name={product.name}
             slug={product.slug}
             price={price}
             image={product.productImages[0]?.path}
             stock={stock}
-            quantity={1}
+            variants={
+              product.hasVariants
+                ? product.variants.map((v) => ({
+                    ...v,
+                    price: Number(v.price),
+                  }))
+                : undefined
+            }
           />
 
           {product.features && (
@@ -146,12 +138,18 @@ export default async function ProductDetailPage({
       <div className="mt-16">
         <ProductRelated
           products={relatedProducts.map((p) => ({
-            ...p,
+            id: p.id,
+            name: p.name,
+            slug: p.slug,
             price: Number(p.variants[0]?.price ?? p.minPrice ?? 0),
             compareAtPrice: p.variants[0]?.compareAtPrice
               ? Number(p.variants[0].compareAtPrice)
               : null,
             averageRating: Number(p.averageRating),
+            reviewCount: p.reviewCount,
+            isFeatured: p.isFeatured,
+            category: p.category,
+            productImages: p.productImages,
           }))}
         />
       </div>

@@ -7,7 +7,13 @@ export default async function StorefrontLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  let session = null;
+  try {
+    session = await auth();
+  } catch {
+    // JWT decode fails if cookie was created with a different secret.
+    // Treat as logged-out — the page works fine without a session.
+  }
 
   return (
     <div className="flex min-h-screen flex-col">

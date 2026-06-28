@@ -9,12 +9,15 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log("Seeding database...");
 
-  const adminPassword = await bcrypt.hash("password", 12);
+  // Clear all existing users
+  await prisma.user.deleteMany();
+  console.log("Cleared all users");
 
-  const admin = await prisma.user.upsert({
-    where: { email: "admin@example.com" },
-    update: {},
-    create: {
+  const adminPassword = await bcrypt.hash("password", 12);
+  const userPassword = await bcrypt.hash("password", 12);
+
+  const admin = await prisma.user.create({
+    data: {
       name: "Admin User",
       email: "admin@example.com",
       password: adminPassword,
@@ -23,7 +26,17 @@ async function main() {
     },
   });
 
-  console.log("Created admin user:", admin.email);
+  const user = await prisma.user.create({
+    data: {
+      name: "Normal User",
+      email: "user@example.com",
+      password: userPassword,
+      role: UserRole.USER,
+      isVerified: true,
+    },
+  });
+
+  console.log("Created users:", admin.email, user.email);
 
   const categories = [
     {
@@ -194,6 +207,7 @@ async function main() {
 
   console.log("Created products:", createdProducts.length);
 
+  await prisma.storefrontAnnouncement.deleteMany();
   await prisma.storefrontAnnouncement.create({
     data: {
       title: "Free shipping on orders over 5000 BDT!",

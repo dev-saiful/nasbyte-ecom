@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
-import NextAuth from "next-auth";
+import { auth } from "@/lib/auth";
 
-const { auth } = NextAuth({
-  providers: [],
-  session: { strategy: "jwt" },
-});
-
-export default auth((req) => {
+export const proxy = auth((req) => {
   const { pathname } = req.nextUrl;
   const session = req.auth;
 
-  // Guest-only routes (redirect to /account if logged in)
   const guestOnlyRoutes = ["/login", "/register"];
   if (guestOnlyRoutes.some((route) => pathname.startsWith(route))) {
     if (session) {
@@ -18,7 +12,6 @@ export default auth((req) => {
     }
   }
 
-  // Auth-required routes
   const authRequiredRoutes = ["/account", "/checkout"];
   if (authRequiredRoutes.some((route) => pathname.startsWith(route))) {
     if (!session) {
@@ -28,7 +21,6 @@ export default auth((req) => {
     }
   }
 
-  // Verified-required routes
   const verifiedRequiredRoutes = ["/checkout"];
   if (verifiedRequiredRoutes.some((route) => pathname.startsWith(route))) {
     if (session && !session.user.isVerified) {
@@ -36,7 +28,6 @@ export default auth((req) => {
     }
   }
 
-  // Admin-only routes
   const adminRoutes = ["/admin"];
   if (adminRoutes.some((route) => pathname.startsWith(route))) {
     if (!session) {

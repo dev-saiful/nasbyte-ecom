@@ -6,24 +6,21 @@ import {
   Star,
   Users,
 } from "lucide-react";
+import { redirect } from "next/navigation";
 import { AdminDashboardCharts } from "@/components/admin/admin-dashboard-charts";
 import { AdminKpiCard } from "@/components/admin/admin-kpi-card";
 import { AdminLowStockAlerts } from "@/components/admin/admin-low-stock-alerts";
 import { AdminRecentOrders } from "@/components/admin/admin-recent-orders";
+import { auth } from "@/lib/auth";
+import { getDashboardStats } from "@/lib/dashboard";
 import { formatBDT } from "@/lib/utils";
 
-async function getDashboardStats() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/admin/dashboard`, {
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    throw new Error("Failed to fetch dashboard stats");
-  }
-  return res.json();
-}
-
 export default async function AdminDashboardPage() {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN") {
+    redirect("/login");
+  }
+
   const stats = await getDashboardStats();
 
   return (

@@ -49,7 +49,14 @@ function LoginForm() {
         return;
       }
 
-      router.push(callbackUrl);
+      const res = await fetch("/api/auth/session");
+      const session = await res.json();
+
+      if (session?.user?.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push(callbackUrl);
+      }
       router.refresh();
     } catch {
       toast.error("Something went wrong. Please try again.");

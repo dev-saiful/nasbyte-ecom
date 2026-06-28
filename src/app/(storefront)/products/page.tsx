@@ -100,12 +100,18 @@ export default async function ProductsPage({
           <div className="mt-6">
             <ProductList
               products={products.map((p) => ({
-                ...p,
+                id: p.id,
+                name: p.name,
+                slug: p.slug,
                 price: Number(p.variants[0]?.price ?? p.minPrice ?? 0),
                 compareAtPrice: p.variants[0]?.compareAtPrice
                   ? Number(p.variants[0].compareAtPrice)
                   : null,
                 averageRating: Number(p.averageRating),
+                reviewCount: p.reviewCount,
+                isFeatured: p.isFeatured,
+                category: p.category,
+                productImages: p.productImages,
               }))}
             />
           </div>
