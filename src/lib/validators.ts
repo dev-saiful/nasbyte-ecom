@@ -47,8 +47,8 @@ export const checkoutSchema = z.object({
   shippingPhone: z.string().min(1, "Phone is required"),
   paymentMethod: z.enum(["CASH_ON_DELIVERY", "CARD", "MOBILE_BANKING"]),
   notes: z.string().max(500).optional(),
-  guestName: z.string().min(1).max(255).optional(),
-  guestEmail: z.string().email().optional(),
+  guestName: z.string().min(1, "Name is required").max(255).optional(),
+  guestEmail: z.string().email().optional().or(z.literal("")),
   cartItems: z
     .array(
       z.object({

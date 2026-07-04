@@ -1,5 +1,7 @@
--- Remaining changes after partial previous migration
--- (cart_items, inventory_stock_logs, is_default, min_price already done)
+-- Step 0: Add columns that are missing from init but required by this migration
+ALTER TABLE "product_variants" ADD COLUMN "is_default" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "products" ADD COLUMN "min_price" DECIMAL(10,2);
+ALTER TABLE "inventory_stock_logs" ADD COLUMN "variant_id" UUID;
 
 -- Step 1: Make order_items.product_id nullable
 ALTER TABLE "order_items" ALTER COLUMN "product_id" DROP NOT NULL;

@@ -28,6 +28,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
+    if (!isLoggedIn && !data.guestName) {
+      return NextResponse.json(
+        { error: "Name is required for guest checkout" },
+        { status: 400 },
+      );
+    }
+
     const variantIds = data.cartItems.map((i) => i.variantId);
     const variants = await prisma.productVariant.findMany({
       where: { id: { in: variantIds } },
@@ -118,6 +125,8 @@ export async function POST(request: Request) {
           shippingPhone: data.shippingPhone,
           paymentMethod: data.paymentMethod,
           notes: data.notes,
+          guestName: !isLoggedIn ? data.guestName || null : null,
+          guestEmail: !isLoggedIn ? data.guestEmail || null : null,
           userId: isLoggedIn ? session.user?.id : null,
           items: {
             create: cartItems.map((item) => ({
