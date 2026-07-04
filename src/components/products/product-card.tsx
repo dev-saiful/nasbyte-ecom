@@ -102,13 +102,12 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        <div className="flex gap-2 pt-1">
-          <Button size="sm" className="flex-1">
-            Add to Cart
-          </Button>
-          <Button size="sm" variant="outline" className="flex-1">
-            Buy Now
-          </Button>
+        <div className="pt-1">
+          <Link href={`/products/${product.slug}`} className="block">
+            <Button size="sm" className="w-full">
+              View Details
+            </Button>
+          </Link>
         </div>
       </CardContent>
     </Card>

@@ -2,6 +2,7 @@
 
 import { LogOut, Menu, Search, ShoppingBag, User } from "lucide-react";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -107,11 +108,7 @@ export function StorefrontHeader({ user }: StorefrontHeaderProps) {
                   render={<Link href="/account/orders">My Orders</Link>}
                 />
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => {
-                    window.location.href = "/api/auth/signout";
-                  }}
-                >
+                <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
                   <LogOut className="mr-2 size-4" />
                   Sign Out
                 </DropdownMenuItem>
@@ -178,9 +175,7 @@ export function StorefrontHeader({ user }: StorefrontHeaderProps) {
                     <div className="my-2 border-t" />
                     <button
                       type="button"
-                      onClick={() => {
-                        window.location.href = "/api/auth/signout";
-                      }}
+                      onClick={() => signOut({ callbackUrl: "/" })}
                       className="text-left text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                     >
                       Sign Out

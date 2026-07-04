@@ -51,8 +51,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.isVerified = token.isVerified as boolean;
+        // Re-hydrate role and isVerified from DB to avoid stale JWT claims
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { role: true, isVerified: true },
+        });
+        if (dbUser) {
+          session.user.role = dbUser.role;
+          session.user.isVerified = dbUser.isVerified;
+        } else {
+          session.user.role = token.role as string;
+          session.user.isVerified = token.isVerified as boolean;
+        }
       }
       return session;
     },

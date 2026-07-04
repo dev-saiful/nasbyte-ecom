@@ -44,14 +44,13 @@ export default function CheckoutPage() {
 
     setIsLoading(true);
     try {
-      const payload: Record<string, unknown> = { ...data };
-
-      if (!isLoggedIn) {
-        payload.cartItems = items.map((item) => ({
+      const payload: Record<string, unknown> = {
+        ...data,
+        cartItems: items.map((item) => ({
           variantId: item.variantId,
           quantity: item.quantity,
-        }));
-      }
+        })),
+      };
 
       const response = await fetch("/api/checkout", {
         method: "POST",

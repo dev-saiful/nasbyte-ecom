@@ -91,6 +91,29 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     const data = parsed.data;
 
+    // Validate variants — at least one required, exactly one default
+    if (!data.variants || data.variants.length === 0) {
+      return NextResponse.json(
+        { error: "At least one product variant is required" },
+        { status: 400 },
+      );
+    }
+    const defaultCount = data.variants.filter((v) => v.isDefault).length;
+    if (defaultCount !== 1) {
+      return NextResponse.json(
+        { error: "Exactly one variant must be marked as default" },
+        { status: 400 },
+      );
+    }
+    for (const variant of data.variants) {
+      if (variant.price <= 0) {
+        return NextResponse.json(
+          { error: "All variants must have a positive price" },
+          { status: 400 },
+        );
+      }
+    }
+
     const existing = await prisma.product.findFirst({
       where: { id, deletedAt: null },
     });

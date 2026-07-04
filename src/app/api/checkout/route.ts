@@ -24,92 +24,44 @@ export async function POST(request: Request) {
     }
     const data = parsed.data;
 
-    let cartItems: {
-      variantId: string;
-      quantity: number;
-      variant: {
-        id: string;
-        price: { toString(): string };
-        stock: number;
-        product: {
-          id: string;
-          name: string;
-          productImages: { path: string }[];
-        };
-        variantOptions: {
-          optionValue: { option: { name: string }; value: string };
-        }[];
-      };
-    }[];
-
-    if (isLoggedIn) {
-      cartItems = await prisma.cartItem.findMany({
-        where: { userId: session.user?.id },
-        include: {
-          variant: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  productImages: {
-                    select: { path: true },
-                    orderBy: { sortOrder: "asc" as const },
-                    take: 1,
-                  },
-                },
-              },
-              variantOptions: {
-                include: {
-                  optionValue: {
-                    include: { option: true },
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
-    } else {
-      if (!data.cartItems || data.cartItems.length === 0) {
-        return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
-      }
-
-      const variantIds = data.cartItems.map((i) => i.variantId);
-      const variants = await prisma.productVariant.findMany({
-        where: { id: { in: variantIds } },
-        include: {
-          product: {
-            select: {
-              id: true,
-              name: true,
-              productImages: {
-                select: { path: true },
-                orderBy: { sortOrder: "asc" as const },
-                take: 1,
-              },
-            },
-          },
-          variantOptions: {
-            include: {
-              optionValue: {
-                include: { option: true },
-              },
-            },
-          },
-        },
-      });
-
-      const variantMap = new Map(variants.map((v) => [v.id, v]));
-
-      cartItems = data.cartItems.map((item) => {
-        const variant = variantMap.get(item.variantId);
-        if (!variant) {
-          throw new Error(`Product variant not found: ${item.variantId}`);
-        }
-        return { ...item, variant };
-      });
+    if (!data.cartItems || data.cartItems.length === 0) {
+      return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
+
+    const variantIds = data.cartItems.map((i) => i.variantId);
+    const variants = await prisma.productVariant.findMany({
+      where: { id: { in: variantIds } },
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+            productImages: {
+              select: { path: true },
+              orderBy: { sortOrder: "asc" as const },
+              take: 1,
+            },
+          },
+        },
+        variantOptions: {
+          include: {
+            optionValue: {
+              include: { option: true },
+            },
+          },
+        },
+      },
+    });
+
+    const variantMap = new Map(variants.map((v) => [v.id, v]));
+
+    const cartItems = data.cartItems.map((item) => {
+      const variant = variantMap.get(item.variantId);
+      if (!variant) {
+        throw new Error(`Product variant not found: ${item.variantId}`);
+      }
+      return { ...item, variant };
+    });
 
     if (cartItems.length === 0) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
@@ -222,11 +174,13 @@ export async function POST(request: Request) {
     });
 
     if (orderWithItems) {
-      const customerName = data.guestName || "Customer";
+      const customerName =
+        (isLoggedIn ? session.user?.name : data.guestName) || "Customer";
+      const customerEmail = isLoggedIn ? session.user?.email : data.guestEmail;
 
-      if (data.guestEmail) {
+      if (customerEmail) {
         await sendOrderConfirmationEmail(
-          data.guestEmail,
+          customerEmail,
           customerName,
           orderWithItems.orderNumber,
           Number(orderWithItems.total),

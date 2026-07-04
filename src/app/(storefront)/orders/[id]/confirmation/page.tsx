@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { OrderDetails } from "@/components/order/order-details";
 import { OrderTimeline } from "@/components/order/order-timeline";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 interface OrderConfirmationPageProps {
@@ -12,18 +13,31 @@ interface OrderConfirmationPageProps {
 export default async function OrderConfirmationPage({
   params,
 }: OrderConfirmationPageProps) {
+  const session = await auth();
   const { id } = await params;
 
-  const order = await prisma.order.findUnique({
-    where: { id, deletedAt: null },
-    include: {
-      items: {
+  // Authenticated users can only see their own orders; guests see any (just-placed)
+  const order = session?.user?.id
+    ? await prisma.order.findFirst({
+        where: { id, userId: session.user.id, deletedAt: null },
         include: {
-          variant: { select: { id: true, name: true } },
+          items: {
+            include: {
+              variant: { select: { id: true, name: true } },
+            },
+          },
         },
-      },
-    },
-  });
+      })
+    : await prisma.order.findUnique({
+        where: { id, deletedAt: null },
+        include: {
+          items: {
+            include: {
+              variant: { select: { id: true, name: true } },
+            },
+          },
+        },
+      });
 
   if (!order) {
     notFound();

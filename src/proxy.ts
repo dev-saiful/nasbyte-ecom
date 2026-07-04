@@ -12,7 +12,7 @@ export const proxy = auth((req) => {
     }
   }
 
-  const authRequiredRoutes = ["/account", "/checkout"];
+  const authRequiredRoutes = ["/account"];
   if (authRequiredRoutes.some((route) => pathname.startsWith(route))) {
     if (!session) {
       const loginUrl = new URL("/login", req.url);
