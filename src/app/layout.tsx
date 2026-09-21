@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Playfair_Display } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { Providers } from "@/components/layout/providers";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -31,6 +32,7 @@ export default function RootLayout({
       className={`${playfair.variable} ${dmSans.variable} h-full`}
       suppressHydrationWarning
     >
+      <GoogleTagManager gtmId="GTM-TMP7L937" />
       <body className="min-h-full bg-background text-foreground font-body antialiased">
         <Providers>
           <ThemeProvider
