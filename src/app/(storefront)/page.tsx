@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ProductCard } from "@/components/products/product-card";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function StorefrontHomePage() {
   const [featuredProducts, categories, announcement] = await Promise.all([
     prisma.product.findMany({
