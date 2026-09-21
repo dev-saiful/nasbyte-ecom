@@ -3,7 +3,7 @@
 import { LogOut, Menu, Search, ShoppingBag, User } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +36,12 @@ interface StorefrontHeaderProps {
 
 export function StorefrontHeader({ user }: StorefrontHeaderProps) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { totalItems } = useCart();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -75,7 +80,7 @@ export function StorefrontHeader({ user }: StorefrontHeaderProps) {
               className="relative"
             >
               <ShoppingBag className="size-4" />
-              {totalItems > 0 && (
+              {mounted && totalItems > 0 && (
                 <Badge
                   variant="secondary"
                   className="absolute -right-1 -top-1 size-4 justify-center rounded-full p-0 text-[10px]"

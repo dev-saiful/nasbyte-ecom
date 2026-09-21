@@ -5,35 +5,52 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-export default async function StorefrontHomePage() {
-  const [featuredProducts, categories, announcement] = await Promise.all([
-    prisma.product.findMany({
-      where: { isActive: true, isFeatured: true, deletedAt: null },
-      include: {
-        category: { select: { name: true, slug: true } },
-        productImages: {
-          select: { path: true, sortOrder: true },
-          orderBy: { sortOrder: "asc" },
-          take: 1,
-        },
-        variants: {
-          where: { isDefault: true },
-          select: { price: true, compareAtPrice: true },
-        },
+function fetchProducts() {
+  return prisma.product.findMany({
+    where: { isActive: true, isFeatured: true, deletedAt: null },
+    include: {
+      category: { select: { name: true, slug: true } },
+      productImages: {
+        select: { path: true, sortOrder: true },
+        orderBy: { sortOrder: "asc" },
+        take: 1,
       },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-    }),
-    prisma.category.findMany({
-      where: { isActive: true, deletedAt: null },
-      select: { id: true, name: true, slug: true, imagePath: true },
-      orderBy: { name: "asc" },
-    }),
-    prisma.storefrontAnnouncement.findFirst({
-      where: { isActive: true },
-      select: { title: true },
-    }),
-  ]);
+      variants: {
+        where: { isDefault: true },
+        select: { price: true, compareAtPrice: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 8,
+  });
+}
+
+function fetchCategories() {
+  return prisma.category.findMany({
+    where: { isActive: true, deletedAt: null },
+    select: { id: true, name: true, slug: true, imagePath: true },
+    orderBy: { name: "asc" },
+  });
+}
+
+export default async function StorefrontHomePage() {
+  let featuredProducts: Awaited<ReturnType<typeof fetchProducts>> = [];
+  let categories: Awaited<ReturnType<typeof fetchCategories>> = [];
+  let announcement: { title: string | null } | null = null;
+
+  try {
+    [featuredProducts, categories, announcement] = await Promise.all([
+      fetchProducts(),
+      fetchCategories(),
+      prisma.storefrontAnnouncement.findFirst({
+        where: { isActive: true },
+        select: { title: true },
+      }),
+    ]);
+  } catch {
+    // Database may be unreachable — render the page with empty data
+    // instead of crashing the entire storefront.
+  }
 
   return (
     <div className="space-y-12 pb-16">

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -23,9 +24,19 @@ export default function GlobalError({
         <p className="mt-2 text-muted-foreground">
           An unexpected error occurred.
         </p>
-        <Button onClick={() => reset()} className="mt-4">
-          Try Again
-        </Button>
+        {error.digest && (
+          <p className="mt-1 font-mono text-xs text-muted-foreground">
+            Error: {error.digest}
+          </p>
+        )}
+        <div className="mt-4 flex justify-center gap-3">
+          <Button onClick={() => reset()} variant="outline">
+            Try Again
+          </Button>
+          <Link href="/">
+            <Button>Go Home</Button>
+          </Link>
+        </div>
       </div>
     </div>
   );
